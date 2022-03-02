@@ -1,0 +1,6 @@
+
+class EventoEntrada{
+
+};
+
+export{EventoEntrada};

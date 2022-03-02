@@ -1,8 +1,18 @@
 "use strict";
 
 import { IncomingMessage } from "http";
+import { PtoVistaProblem } from "./PuntosDeVista/PtoVistaProblem";
 
 const http = require('http');
+
+
+function callbackEjemplo(evento:string) {
+    console.log("EVENTO INTERESANTE GENERADO!:");
+    console.log(evento);
+}
+
+let p1 = new PtoVistaProblem(callbackEjemplo,"script_hello_judge");
+
 
 http.get({
     hostname: '192.168.1.152',
@@ -40,8 +50,20 @@ http.get({
 
     let rawData = '';
     res.on('data', (chunk : any) => {
-        console.log("CHUNK: " + chunk + "\n");
+        //console.log("CHUNK: " + chunk + "\n");
         rawData += chunk;
+        
+        //recorrer TODOS LOS PV
+        let obj : JSON;
+        try{
+            obj = JSON.parse(chunk);
+
+            p1.procesar(obj);
+            
+        } catch( e : any ) {
+            console.log("Chunk vacio");
+        }
+
     });
     res.on('end', () => {
         try {
@@ -56,6 +78,8 @@ http.get({
 }).on("error", (err : Error) => {
     console.log("Error: " + err.message);
 });
+
+
 
 
 
