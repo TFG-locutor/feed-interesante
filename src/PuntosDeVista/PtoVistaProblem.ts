@@ -1,4 +1,4 @@
-import { EventoEntrada } from "../EventoEntrada";
+import { Evento } from "../Eventos/Evento";
 import { PuntoDeVista } from "../PuntoDeVista";
 
 class PtoVistaProblem extends PuntoDeVista{
@@ -10,12 +10,12 @@ class PtoVistaProblem extends PuntoDeVista{
         this._id_problema = id_problema;
     }
 
-    filtrar(evento: String): boolean {
+    filtrar(evento: Evento): boolean {
         throw new Error("Method not implemented.");
     }
     procesar(evento: any): void {
         //console.log(evento);
-        if(evento.type=="submissions" && evento.data.problem_id==this._id_problema) {
+        if(evento.tipo=="submission" && evento.problem_id==this._id_problema) {
             this._callback("Soy yo!");
         }
     }

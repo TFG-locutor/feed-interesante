@@ -1,6 +1,0 @@
-
-class EventoEntrada{
-
-};
-
-export{EventoEntrada};

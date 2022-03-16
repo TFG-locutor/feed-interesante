@@ -1,6 +1,7 @@
 "use strict";
 
 import { IncomingMessage } from "http";
+import { EventFactory } from "./Eventos/EventFactory";
 import { PtoVistaProblem } from "./PuntosDeVista/PtoVistaProblem";
 
 const http = require('http');
@@ -58,10 +59,13 @@ http.get({
         try{
             obj = JSON.parse(chunk);
 
-            p1.procesar(obj);
+            var ev = EventFactory.obtenerEventoDesdeJSON(obj);
+
+            p1.procesar(ev);
             
         } catch( e : any ) {
-            console.log("Chunk vacio");
+            if(e.constructor.name!="SyntaxError") console.log(e);
+            else console.log("Chunk vacio");
         }
 
     });

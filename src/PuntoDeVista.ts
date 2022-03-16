@@ -1,4 +1,4 @@
-import { EventoEntrada } from "./EventoEntrada";
+import { Evento } from "./Eventos/Evento";
 
 abstract class PuntoDeVista {
 
@@ -8,7 +8,7 @@ abstract class PuntoDeVista {
         this._callback = callback;
     }
 
-    abstract filtrar( evento : EventoEntrada ) : boolean;
+    abstract filtrar( evento : Evento ) : boolean;
     abstract procesar( evento : JSON ) : void;
 
 
