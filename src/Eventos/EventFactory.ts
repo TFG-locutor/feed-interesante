@@ -11,12 +11,13 @@ import { SubmissionEvent } from "./SubmissionEvent";
 
 abstract class EventFactory {
 
-    static obtenerEventoDesdeJSON(json: any): Evento {
+    static obtenerEventoDesdeJSON(json: any) : Evento | null {
 
-        assert(json!=undefined&&json!=null);
-        assert(json.type!=undefined&&json.type!=null);
-        assert(json.op!=undefined&&json.op!=null);
-        assert(json.data!=undefined&&json.data!=null);
+        if(json==undefined||json==null) throw "JSON no existente. No se puede crear la estructura del evento";
+        for(var field of ["type","op","data"]) {
+            if(json[field]==undefined||json[field]==null)
+                throw "No se puede crear la estructura del evento. El campo "+field+" tiene el valor: "+json[field];
+        }
 
         switch(json.type) {
             case "clarifications": return new ClarificationEvent(json.data, json.op);
@@ -27,6 +28,7 @@ abstract class EventFactory {
             case "problems": return new ProblemEvent(json.data, json.op);
             case "submissions": return new SubmissionEvent(json.data, json.op);
             case "teams": return new TeamEvent(json.data, json.op);
+            case "runs": case "languages": case "contests": case "state":return null;
         }
 
 

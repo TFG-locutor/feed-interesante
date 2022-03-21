@@ -8,8 +8,8 @@ const http = require('http');
 
 
 function callbackEjemplo(evento:string) {
-    console.log("EVENTO INTERESANTE GENERADO!:");
-    console.log(evento);
+    console.log("Evento interesante: " + evento);
+    //console.log(evento);
 }
 
 let p1 = new PtoVistaProblem(callbackEjemplo,"script_hello_judge");
@@ -61,7 +61,7 @@ http.get({
 
             var ev = EventFactory.obtenerEventoDesdeJSON(obj);
 
-            p1.procesar(ev);
+            if(ev!=null) p1.procesar(ev);
             
         } catch( e : any ) {
             if(e.constructor.name!="SyntaxError") console.log(e);
