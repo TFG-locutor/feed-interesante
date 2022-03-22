@@ -61,10 +61,14 @@ http.get({
 
             var ev = EventFactory.obtenerEventoDesdeJSON(obj);
 
-            if(ev!=null) p1.procesar(ev);
-            
+            if(ev!=null) {
+                p1.procesar(ev);
+                ev = EventFactory.ProcesarYEnriquecerEvento(ev);
+                if(ev!=null) p1.procesar(ev);
+            }
+
         } catch( e : any ) {
-            if(e.constructor.name!="SyntaxError") console.log(e);
+            if(e.constructor.name!="SyntaxError") console.log("[ERROR]: " + e);
             else console.log("Chunk vacio");
         }
 
