@@ -1,4 +1,4 @@
-import { assert } from "console";
+
 import { Evento } from "./Evento";
 import { ClarificationEvent } from "./ClarificationEvent";
 import { GroupEvent } from "./GroupEvent";
@@ -124,11 +124,10 @@ class EventFactory {
                     var evJud = ev as JudgementEvent;
                     
                     let subData = this._pending_submissions.get(evJud.submission_id);
-                    if(subData==undefined) break;//throw "Error interno, no existe un envío pasado con id "+evJud.submission_id;
+                    if(subData==undefined) break; //throw "Error interno, no existe un envío pasado con id "+evJud.submission_id;
                     this._pending_submissions.delete(evJud.submission_id);
     
                     //TODO: cambiar el ACs hardcodeadedo, utilizando la entidad judgement_type
-                    //TODO: poner el nombre del equipo, y problema utilizando estructuras de datos adecuadas
 
                     if(evJud.judgement_type_id=="AC"){
                         this._intentos_por_equipo.set(subData.equipo,-this._intentos_por_equipo.get(subData.equipo));

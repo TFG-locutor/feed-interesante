@@ -20,7 +20,6 @@
 ]
 */
 
-import { assert } from "console";
 import { Evento } from "./Evento";
 
 class TeamEvent extends Evento {

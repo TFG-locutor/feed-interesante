@@ -12,7 +12,6 @@ abstract class PuntoDeVista {
     abstract actualizar( evento : Evento ) : void;
 
     procesar( evento : Evento ) : void {
-        //console.log(evento);
         if(this.filtrar(evento)) this.actualizar(evento);
     }
 

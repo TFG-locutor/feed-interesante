@@ -15,7 +15,6 @@
 ]
 */
 
-import { assert } from "console";
 import { Evento } from "./Evento";
 
 class OrganizationEvent extends Evento {

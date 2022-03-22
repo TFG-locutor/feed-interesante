@@ -11,7 +11,6 @@
 "answered": true
 */
 
-import { assert } from "console";
 import { Evento } from "./Evento";
 
 class ClarificationEvent extends Evento {

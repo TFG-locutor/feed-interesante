@@ -7,7 +7,6 @@
 "color": "string"
 */
 
-import { assert } from "console";
 import { Evento } from "./Evento";
 
 class GroupEvent extends Evento {

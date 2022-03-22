@@ -11,7 +11,6 @@
 "max_run_time": 0
 */
 
-import { assert } from "console";
 import { Evento } from "./Evento";
 
 class JudgementEvent extends Evento {
