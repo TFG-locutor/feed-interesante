@@ -10,6 +10,8 @@ import { TeamEvent } from "./TeamEvent";
 import { SubmissionEvent } from "./SubmissionEvent";
 import { EventoVeredicto } from "./Custom/EventoVeredicto";
 import { EventoEnvio } from "./Custom/EventoEnvio";
+import { ContestEvent } from "./ContestsEvent";
+import { LanguageEvent } from "./LanguageEvent";
 
 type TSubData = {
     equipo:string;
@@ -62,6 +64,8 @@ class EventFactory {
     }
     public obtenerEventoDesdeJSON(json: any) : Evento | null {
 
+        //console.log(json);
+
         if(json==undefined||json==null) throw "JSON no existente. No se puede crear la estructura del evento";
         for(var field of ["type","op","data"]) {
             if(json[field]==undefined||json[field]==null)
@@ -69,15 +73,17 @@ class EventFactory {
         }
 
         switch(json.type) {
+            case "contests": return new ContestEvent(json.data, json.op);
             case "clarifications": return new ClarificationEvent(json.data, json.op);
             case "groups": return new GroupEvent(json.data, json.op);
             case "judgements": return new JudgementEvent(json.data, json.op);
             case "judgement-types": return new JudgementTypeEvent(json.data, json.op);
+            case "languages": return new LanguageEvent(json.data, json.op);
             case "organizations": return new OrganizationEvent(json.data, json.op);
             case "problems": return new ProblemEvent(json.data, json.op);
             case "submissions": return new SubmissionEvent(json.data, json.op);
             case "teams": return new TeamEvent(json.data, json.op);
-            case "runs": case "languages": case "contests": case "state":return null;
+            case "runs": case "state":return null;
             default: throw "Evento no reconocido: "+json.type;
         }
 

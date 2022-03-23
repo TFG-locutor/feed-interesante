@@ -5,6 +5,9 @@
         "typescript": "^4.6.2"
     },
     "scripts": {
-        "start": "npx tsc && node build/apiReader.js"
+        "start": "npx tsc && node build/index.js"
+    },
+    "dependencies": {
+        "confinode": "^2.1.1"
     }
 }

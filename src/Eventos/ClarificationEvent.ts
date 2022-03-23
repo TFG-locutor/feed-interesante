@@ -27,7 +27,7 @@ class ClarificationEvent extends Evento {
     answered!: boolean;
 
     constructor(json : any, op: string) {
-        super(op, "clarification", json, ["id","time","contest_time","problem:_id","reply_to_id","from_team_id","to_team_id","externalid","text","answered"]);
+        super(op, "clarification", json, ["id","time","contest_time","problem_id","reply_to_id","from_team_id","to_team_id","externalid","text","answered"]);
     }
 
 }

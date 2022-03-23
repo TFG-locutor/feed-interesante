@@ -25,6 +25,8 @@ class ProblemEvent extends Evento {
     test_data_count!: number;
 
     constructor(json : any, op: string) {
+        //console.log(op);
+        //console.log(json);
         super(op, "problem", json, ["id",/*"label",*//*"short_name",*/"name","ordinal",/*"rgb","color",*/"time_limit","test_data_count"]);
     }
 
