@@ -12,7 +12,7 @@ console.log("Iniciando Programa...");
 try{
     console.log("Cargando configuración")
     let conf : Configuration = ConfigurationLoader.load();
-    let apiReader = new APIReader(conf.url, conf.port, conf.contest_id, conf.api_version);
+    let apiReader = new APIReader(conf.url, conf.port, conf.contest_id, conf.api_version, conf.api_user, conf.api_password);
     
     //apiReader.start_listen();
     let obs = apiReader.suscribe_to_feed().pipe(
@@ -22,7 +22,7 @@ try{
         filter(e=> e!==null),
         );
 
-    let p1 = new PtoVistaProblem(obs,"1"); 
+    let p1 = new PtoVistaProblem(obs,"script_hello_judge"); 
 
 
 

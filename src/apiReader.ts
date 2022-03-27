@@ -22,12 +22,16 @@ class APIReader {
     port: number;
     contest_id: string;
     api_version: string;
+    authuser: string;
+    authpasswd: string;
 
-    constructor(hostname: string, port: number, contest_id: string, api_version: string) {
+    constructor(hostname: string, port: number, contest_id: string, api_version: string, authuser: string, authpasswd: string) {
         this.hostname = hostname;
         this.contest_id = contest_id;
         this.port = port;
         this.api_version = api_version;
+        this.authuser = authuser;
+        this.authpasswd = authpasswd;
     }
 
     public suscribe_to_feed(){
@@ -41,7 +45,7 @@ class APIReader {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                auth: 'admin:admin',
+                auth: this.authuser+':'+this.authpasswd,
                 qs: {
                     strict: false,
                     stream: true

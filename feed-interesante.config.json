@@ -1,8 +1,8 @@
 {
-    "url": "192.168.100.150",
+    "url": "192.168.1.152",
     "port": 80,
     "api_version": "v4",
-    "contest_id": "contest",
-    "api_user": "admin",
-    "api_password": "admin"
+    "contest_id": "1234",
+    "api_user": "apiuser",
+    "api_password": "apiuser"
 }

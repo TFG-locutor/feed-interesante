@@ -10,6 +10,8 @@ interface Configuration {
     readonly port: number;
     readonly api_version: string;
     readonly contest_id: string;
+    readonly api_user: string;
+    readonly api_password: string;
 }
 
 
@@ -20,7 +22,9 @@ abstract class ConfigurationLoader {
             url: stringItem(),
             port: numberItem(),
             api_version: stringItem(),
-            contest_id: stringItem()
+            contest_id: stringItem(),
+            api_user: stringItem(),
+            api_password: stringItem()
         });
         const confinod = new Confinode("feed-interesante", description , {
             cache: false,
@@ -38,7 +42,9 @@ abstract class ConfigurationLoader {
             url: datos.configuration.url,
             port: datos.configuration.port,
             api_version: datos.configuration.api_version,
-            contest_id: datos.configuration.contest_id
+            contest_id: datos.configuration.contest_id,
+            api_user: datos.configuration.api_user,
+            api_password: datos.configuration.api_password
         };
     }
 
