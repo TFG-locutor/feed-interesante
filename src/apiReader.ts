@@ -60,24 +60,46 @@ class APIReader {
             }
             res.setEncoding('utf8');
             let rawData = '';
+            let indexData : number = 0; //El siguiente dato (carácter) a procesar
+            let numParentesis = 0; //Número de paréntesis abiertos
+            let insideComillas = false;
+            let anteriorIgualAEscape = false;
             res.on('data', (chunk : any) => {
-                //console.log("CHUNK: " + chunk + "\n");
                 rawData += chunk;
-                //recorrer TODOS LOS PV
-                let obj : JSON;
-                try{
-                    obj = JSON.parse(chunk);
-                    console.log(obj)
-                    suscriber.next(obj);
-                    /* var ev = EventFactory.obtenerEventoDesdeJSON(obj);
-                    if(ev!=null) {
-                        p1.procesar(ev);
-                        ev = EventFactory.ProcesarYEnriquecerEvento(ev);
-                        if(ev!=null) p1.procesar(ev);
-                    } */
-                } catch( e : any ) {
-                    if(e.constructor.name!="SyntaxError") console.log("[ERROR]: " + e);
-                    else console.log("..."); 
+                
+                for(;indexData<rawData.length;++indexData) {
+                    var ch = rawData.charAt(indexData);
+                    if(!anteriorIgualAEscape && ch=='"') insideComillas = !insideComillas;
+                    anteriorIgualAEscape = (/\\/).test(ch);
+                    if(insideComillas) continue;
+                    if(ch=='{') ++numParentesis;
+                    if(ch=='}') --numParentesis;
+                    //let specialCharacter:string = "\\";
+                    
+                    if(anteriorIgualAEscape) console.log("anterioresxcape")
+                    if(numParentesis==0) {
+                        
+                        let dataSTR = rawData.substring(0,indexData+1);
+                        rawData = rawData.substring(indexData+1);
+                        indexData = 0;
+
+                        let obj : JSON;
+
+                        try{
+                            obj = JSON.parse(dataSTR);
+                            //console.log(obj)
+                            suscriber.next(obj);
+                            /* var ev = EventFactory.obtenerEventoDesdeJSON(obj);
+                            if(ev!=null) {
+                                p1.procesar(ev);
+                                ev = EventFactory.ProcesarYEnriquecerEvento(ev);
+                                if(ev!=null) p1.procesar(ev);
+                            } */
+                        } catch( e : any ) {
+                            if(e.constructor.name!="SyntaxError") console.log("[ERROR]: " + e);
+                            else console.log("..."); 
+                        }
+                    }
                 }
             });
             res.on('end', () => {
@@ -125,25 +147,55 @@ class APIReader {
             }        
             res.setEncoding('utf8');
             let rawData = '';
+            let indexData : number = 0; //El siguiente dato (carácter) a procesar
+            let numParentesis = 0; //Número de paréntesis abiertos
+            let insideComillas = false;
+            let anteriorIgualAEscape = false;
             res.on('data', (chunk : any) => {
-                console.log("CHUNK: " + chunk + "\n");
+                //console.log("CHUNK: " + chunk + "\n");
                 rawData += chunk;
-                let obj : JSON;
-                try{
-                    //obj = JSON.parse(chunk);
-                    //console.log(obj)
-                    /* var ev = EventFactory.obtenerEventoDesdeJSON(obj);
-                    if(ev!=null) {
-                        p1.procesar(ev);
-                        ev = EventFactory.ProcesarYEnriquecerEvento(ev);
-                        if(ev!=null) p1.procesar(ev);
-                    } */
-                } catch( e : any ) {
-                    /* if(e.constructor.name!="SyntaxError") console.log("[ERROR]: " + e);
-                    else console.log("..."); */
-                    if(e.constructor.name!="SyntaxError") console.log("[ERROR]: " + e);
-                    else console.log(e)
+                
+                for(;indexData<rawData.length;++indexData) {
+                    var ch = rawData.charAt(indexData);
+                    if(!anteriorIgualAEscape && ch=='"') insideComillas = !insideComillas;
+                    anteriorIgualAEscape = (/\\/).test(ch);
+                    if(insideComillas) continue;
+                    if(ch=='{') ++numParentesis;
+                    if(ch=='}') --numParentesis;
+                    //let specialCharacter:string = "\\";
+                    
+                    if(anteriorIgualAEscape) console.log("anterioresxcape")
+                    if(numParentesis==0) {
+                        
+                        let dataSTR = rawData.substring(0,indexData+1);
+                        rawData = rawData.substring(indexData+1);
+                        indexData = 0;
+
+                        let obj : JSON;
+                        try{
+                            obj = JSON.parse(dataSTR);
+                
+                            console.log("voy a procesar")
+                            console.log(obj)
+                            /* var ev = EventFactory.obtenerEventoDesdeJSON(obj);
+                
+                            if(ev!=null) {
+                                p1.procesar(ev);
+                                ev = EventFactory.ProcesarYEnriquecerEvento(ev);
+                                if(ev!=null) p1.procesar(ev);
+                            } */
+                
+                        } catch( e : any ) {
+                            if(e.constructor.name!="SyntaxError") console.log("[ERROR]: " + e);
+                            else console.log("...");
+                        }
+
+                    }
                 }
+
+                //recorrer TODOS LOS PV
+                
+        
             });
             res.on('end', () => {
                 /* try {

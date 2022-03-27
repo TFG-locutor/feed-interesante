@@ -14,15 +14,15 @@ try{
     let conf : Configuration = ConfigurationLoader.load();
     let apiReader = new APIReader(conf.url, conf.port, conf.contest_id, conf.api_version);
     
-    apiReader.start_listen();
-    /* let obs = apiReader.suscribe_to_feed().pipe(
+    //apiReader.start_listen();
+    let obs = apiReader.suscribe_to_feed().pipe(
         share(), //una misma ejecucion de la request
         map(obj=>EventFactory.obtenerEventoDesdeJSON(obj)),
         concatMap(async (e) => EventFactory.ProcesarYEnriquecerEvento(e)),
         filter(e=> e!==null),
         );
 
-    let p1 = new PtoVistaProblem(obs,"1"); */
+    let p1 = new PtoVistaProblem(obs,"1"); 
 
 
 
