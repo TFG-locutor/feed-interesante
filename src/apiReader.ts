@@ -82,9 +82,7 @@ class APIReader {
                         let dataSTR = rawData.substring(0,indexData+1);
                         rawData = rawData.substring(indexData+1);
                         indexData = 0;
-
                         let obj : JSON;
-
                         try{
                             obj = JSON.parse(dataSTR);
                             //console.log(obj)

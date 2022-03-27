@@ -6,9 +6,7 @@ import { Evento } from "../Eventos/Evento";
 import { PuntoDeVista } from "../PuntoDeVista";
 
 class PtoVistaProblem extends PuntoDeVista{
-    emitir(mensaje:String): void {
-        console.log(mensaje)
-    }
+    
 
     _id_problema : string;
     _ha_sido_resuelto : boolean;
@@ -17,13 +15,6 @@ class PtoVistaProblem extends PuntoDeVista{
         super( eventFeed );
         this._id_problema = id_problema;
         this._ha_sido_resuelto = false;
-        const that = this;
-        
-        this.eventFeed.subscribe({
-            next(event) { that.procesar(event) },
-            error(err) { console.error('something wrong occurred: ' + err); },
-            complete() { console.log('done');}
-        })
     }
 
     filtrar(evento: Evento): boolean {
