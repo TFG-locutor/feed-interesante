@@ -26,12 +26,12 @@ abstract class ConfigurationLoader {
             api_user: stringItem(),
             api_password: stringItem()
         });
-        const confinod = new Confinode("feed-interesante", description , {
+        const confinod = new Confinode("feed_interesante", description , {
             cache: false,
             //logger: msg => console.log(msg)
         } );
 
-        var dir = path.join( path.dirname(__dirname) , "feed-interesante.config.json" );
+        var dir = path.join( path.dirname(__dirname) , "feed_interesante.config.json" );
 
 
         var datos : ConfinodeResult<Configuration> | undefined = confinod.load.sync(dir);
