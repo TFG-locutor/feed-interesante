@@ -1,16 +1,19 @@
 import { Evento } from "./Eventos/Evento";
+import { Observable } from 'rxjs';
 
 abstract class PuntoDeVista {
 
-    _callback : Function;
 
-    constructor( callback : Function ) {
-        this._callback = callback;
+    eventFeed : Observable<Evento>;
+
+    constructor(eventFeed : Observable<Evento> ) {
+        this.eventFeed =eventFeed;
     }
 
     abstract filtrar( evento : Evento ) : boolean;
     abstract actualizar( evento : Evento ) : void;
-
+    abstract emitir (mensaje:String):void;
+    
     procesar( evento : Evento ) : void {
         if(this.filtrar(evento)) this.actualizar(evento);
     }

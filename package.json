@@ -8,6 +8,7 @@
         "start": "npx tsc && node build/index.js"
     },
     "dependencies": {
-        "confinode": "^2.1.1"
+        "confinode": "^2.1.1",
+        "rxjs": "^7.5.5"
     }
 }
