@@ -65,27 +65,45 @@ class APIReader {
             res.setEncoding('utf8');
         
             let rawData = '';
+            let indexData : number = 0; //El siguiente dato (carácter) a procesar
+            let numParentesis = 0; //Número de paréntesis abiertos
             res.on('data', (chunk : any) => {
-                //console.log("CHUNK: " + chunk + "\n");
+                console.log("CHUNK: " + chunk + "\n");
                 rawData += chunk;
                 
-                //recorrer TODOS LOS PV
-                let obj : JSON;
-                try{
-                    obj = JSON.parse(chunk);
-        
-                    var ev = EventFactory.obtenerEventoDesdeJSON(obj);
-        
-                    if(ev!=null) {
-                        p1.procesar(ev);
-                        ev = EventFactory.ProcesarYEnriquecerEvento(ev);
-                        if(ev!=null) p1.procesar(ev);
+                for(;indexData<rawData.length;++indexData) {
+                    if(rawData.charAt(indexData)=='{') ++numParentesis;
+                    if(rawData.charAt(indexData)=='}') --numParentesis;
+                    if(numParentesis==0) {
+                        
+                        console.log("hola")
+
+                        let dataSTR = rawData.substring(0,indexData+1);
+                        rawData = rawData.substring(indexData+1);
+                        indexData = 0;
+
+                        let obj : JSON;
+                        try{
+                            obj = JSON.parse(dataSTR);
+                
+                            var ev = EventFactory.obtenerEventoDesdeJSON(obj);
+                
+                            if(ev!=null) {
+                                p1.procesar(ev);
+                                ev = EventFactory.ProcesarYEnriquecerEvento(ev);
+                                if(ev!=null) p1.procesar(ev);
+                            }
+                
+                        } catch( e : any ) {
+                            if(e.constructor.name!="SyntaxError") console.log("[ERROR]: " + e);
+                            else console.log("...");
+                        }
+
                     }
-        
-                } catch( e : any ) {
-                    if(e.constructor.name!="SyntaxError") console.log("[ERROR]: " + e);
-                    else console.log("...");
                 }
+
+                //recorrer TODOS LOS PV
+                
         
             });
             res.on('end', () => {
