@@ -18,6 +18,7 @@ class PtoVistaProblem extends PuntoDeVista{
         this._id_problema = id_problema;
         this._ha_sido_resuelto = false;
         const that = this;
+        
         this.eventFeed.subscribe({
             next(event) { that.procesar(event) },
             error(err) { console.error('something wrong occurred: ' + err); },

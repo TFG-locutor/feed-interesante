@@ -67,6 +67,7 @@ class APIReader {
                 let obj : JSON;
                 try{
                     obj = JSON.parse(chunk);
+                    console.log(obj)
                     suscriber.next(obj);
                     /* var ev = EventFactory.obtenerEventoDesdeJSON(obj);
                     if(ev!=null) {
@@ -96,7 +97,7 @@ class APIReader {
     })
     }
 
-    public start_listen(suscriber:any) {
+    public start_listen() {
         console.log("Iniciando escucha en el servidor "+this.hostname+", puerto "+this.port);
         http.get({
             hostname: this.hostname,
@@ -106,7 +107,7 @@ class APIReader {
             headers: {
                 'Content-Type': 'application/json'
             },
-            auth: 'apiuser:apiuser',
+            auth: 'admin:admin',
             qs: {
                 strict: false,
                 stream: true
@@ -125,12 +126,12 @@ class APIReader {
             res.setEncoding('utf8');
             let rawData = '';
             res.on('data', (chunk : any) => {
-                //console.log("CHUNK: " + chunk + "\n");
+                console.log("CHUNK: " + chunk + "\n");
                 rawData += chunk;
                 let obj : JSON;
                 try{
-                    obj = JSON.parse(chunk);
-                    suscriber.next(obj);
+                    //obj = JSON.parse(chunk);
+                    //console.log(obj)
                     /* var ev = EventFactory.obtenerEventoDesdeJSON(obj);
                     if(ev!=null) {
                         p1.procesar(ev);
@@ -141,7 +142,7 @@ class APIReader {
                     /* if(e.constructor.name!="SyntaxError") console.log("[ERROR]: " + e);
                     else console.log("..."); */
                     if(e.constructor.name!="SyntaxError") console.log("[ERROR]: " + e);
-                    else suscriber.error(e);
+                    else console.log(e)
                 }
             });
             res.on('end', () => {
@@ -152,7 +153,7 @@ class APIReader {
                 } catch (e:any) {
                     console.error(e.message);
                 } */
-                suscriber.complete();
+                console.log("fin")
             });
         
         }).on("error", (err : Error) => {
