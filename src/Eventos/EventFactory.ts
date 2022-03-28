@@ -40,14 +40,15 @@ class EventFactory {
         return nomProblema;
     }
 
-    //asocia el id de un equipo a los intentos fallidos de un problema (negativo si AC)
-    _intentos_por_equipo: Map<string,any>;
+    //asocia el id de un equipo y el id de un problema a los intentos (negativo si AC)
+    //this._intentos_por_equipo[id_equipo][id_problema]
+    _intentos_por_equipo: Map<string,Map<string,number>>;
 
     //Asocia una submission a un equipo y un problema (para luego poder recuperarlo)
     _pending_submissions: Map<string,TSubData>;
 
     private constructor() {
-        this._intentos_por_equipo = new Map<string,any>();
+        this._intentos_por_equipo = new Map<string,Map<string,number>>();
         this._pending_submissions = new Map<string,TSubData>();
         this._nombre_equipo = new Map<string,string>();
         this._nombre_problema = new Map<string,string>();
@@ -115,8 +116,26 @@ class EventFactory {
                 if(ev.op=="create") {
                     var evSub = ev as SubmissionEvent;
                     var eq = evSub.team_id;
-                    if(this._intentos_por_equipo.get(eq)<0) break; //Este equipo ya ha resuelto el problema, se ignoran envios posteriores
-                    this._intentos_por_equipo.set(eq,(this._intentos_por_equipo.get(eq)|0)+1);
+
+                    //Se garantiza que this._intentos_por_equipo tenga entrada, y se guarda en entry_intentos_por_equipo
+                    var entry_intentos_por_equipo = this._intentos_por_equipo.get(eq);
+                    if(entry_intentos_por_equipo==undefined)
+                        //Si no existe la entrada en el mapa para ese equipo
+                        this._intentos_por_equipo.set(eq,entry_intentos_por_equipo = new Map<string,number>());
+                    //Se garantiza que this._intentos_por_equipo[eq] tenga entrada, y se guarda en entry_intentos_por_equipo_problema
+                    var entry_intentos_por_equipo_problema = entry_intentos_por_equipo.get(evSub.problem_id);
+                    if(entry_intentos_por_equipo_problema==undefined)
+                        //Si no existe la entrada en el mapa para ese problema de ese equipo
+                        entry_intentos_por_equipo.set(evSub.problem_id, entry_intentos_por_equipo_problema = 0); //Se parte de un punto neutro (0 intentos)
+                        
+                    //Se comprueba que el equipo no tenga ya ese problema resuelto
+                    if(entry_intentos_por_equipo_problema<0) break; //Este equipo ya ha resuelto el problema, se ignoran envios posteriores de cara a generar ciertos eventos custom
+
+                    //Se suma 1 al número de intentos
+                    //TODO: cambiar esto de sitio, solo sumar intentos si el veredicto penaliza (ej: no es CE)
+                    entry_intentos_por_equipo.set(evSub.problem_id, entry_intentos_por_equipo_problema + 1)
+
+                    //Se añade el envío a la lista de envios pendientes de procesar
                     this._pending_submissions.set(evSub.id, {equipo: evSub.team_id, problema: evSub.problem_id});
                     return new EventoEnvio(
                         evSub.id,
@@ -133,10 +152,19 @@ class EventFactory {
                     if(subData==undefined) break; //throw "Error interno, no existe un envío pasado con id "+evJud.submission_id;
                     this._pending_submissions.delete(evJud.submission_id);
     
+                    var entry_intentos_por_equipo = this._intentos_por_equipo.get(subData.equipo)
+                    var entry_intentos_por_equipo_problema : number | undefined = 0;
+                    if(entry_intentos_por_equipo!=undefined) {
+                        entry_intentos_por_equipo_problema = entry_intentos_por_equipo.get(subData.problema);
+                        if(entry_intentos_por_equipo_problema==undefined)
+                            throw "Error interno, no existe la entrada '"+subData.problema+"' en el mapa de intentos por equipo/problema";
+                    } else throw "Error interno, no existe la entrada '"+subData.equipo+"' en el mapa de intentos por equipo";
+                    
                     //TODO: cambiar el ACs hardcodeadedo, utilizando la entidad judgement_type
 
                     if(evJud.judgement_type_id=="AC"){
-                        this._intentos_por_equipo.set(subData.equipo,-this._intentos_por_equipo.get(subData.equipo));
+                        //Se pasa a negativo para indicar que el problema ha sido resuelto
+                        entry_intentos_por_equipo.set(subData.problema,entry_intentos_por_equipo_problema=-entry_intentos_por_equipo_problema);
                     }
                     
                     return new EventoVeredicto(
@@ -144,7 +172,7 @@ class EventFactory {
                         subData.equipo, this.getTeamName(subData.equipo),
                         subData.problema, this.getProblemName(subData.problema),
                         evJud.judgement_type_id,
-                        Math.abs(this._intentos_por_equipo.get(subData.equipo))
+                        Math.abs(entry_intentos_por_equipo_problema)
                     );
                 }
                 break;
