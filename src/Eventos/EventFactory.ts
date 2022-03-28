@@ -12,11 +12,18 @@ import { EventoVeredicto } from "./Custom/EventoVeredicto";
 import { EventoEnvio } from "./Custom/EventoEnvio";
 import { ContestEvent } from "./ContestsEvent";
 import { LanguageEvent } from "./LanguageEvent";
+import { stringify } from "querystring";
 
 type TSubData = {
     equipo:string;
     problema:string;
 };
+
+type TJudTypeData = {
+    nombre: string;
+    penaliza: boolean;
+    resuelto: boolean;
+}
 
 //singleton
 class EventFactory {
@@ -47,11 +54,15 @@ class EventFactory {
     //Asocia una submission a un equipo y un problema (para luego poder recuperarlo)
     _pending_submissions: Map<string,TSubData>;
 
+    //Asocia un id a un tipo de submission
+    _judgement_types: Map<string,TJudTypeData>;
+
     private constructor() {
         this._intentos_por_equipo = new Map<string,Map<string,number>>();
         this._pending_submissions = new Map<string,TSubData>();
         this._nombre_equipo = new Map<string,string>();
         this._nombre_problema = new Map<string,string>();
+        this._judgement_types = new Map<string,TJudTypeData>();
     }
 
     public static getInstance() : EventFactory {
@@ -131,10 +142,6 @@ class EventFactory {
                     //Se comprueba que el equipo no tenga ya ese problema resuelto
                     if(entry_intentos_por_equipo_problema<0) break; //Este equipo ya ha resuelto el problema, se ignoran envios posteriores de cara a generar ciertos eventos custom
 
-                    //Se suma 1 al número de intentos
-                    //TODO: cambiar esto de sitio, solo sumar intentos si el veredicto penaliza (ej: no es CE)
-                    entry_intentos_por_equipo.set(evSub.problem_id, entry_intentos_por_equipo_problema + 1)
-
                     //Se añade el envío a la lista de envios pendientes de procesar
                     this._pending_submissions.set(evSub.id, {equipo: evSub.team_id, problema: evSub.problem_id});
                     return new EventoEnvio(
@@ -144,14 +151,24 @@ class EventFactory {
                     );
                 }
                 break;
+            case "judgement_type":
+                if(ev.op=="create"||ev.op=="update") {
+                    var evJudType = ev as JudgementTypeEvent;
+                    this._judgement_types.set(evJudType.id, {nombre: evJudType.name, penaliza: evJudType.penalty, resuelto: evJudType.solved});
+                }
+                break;
             case "judgement":
-                if(ev.op=="update") {
+                if(ev.op=="create" || ev.op=="update") {
                     var evJud = ev as JudgementEvent;
                     
+                    //Si no contiene información del veredicto, se ignora, porque se sabe que en el futuro se va a recibir una actualización
+                    if(!evJud.judgement_type_id) break;
+
                     let subData = this._pending_submissions.get(evJud.submission_id);
                     if(subData==undefined) break; //throw "Error interno, no existe un envío pasado con id "+evJud.submission_id;
                     this._pending_submissions.delete(evJud.submission_id);
     
+                    //Entradas del mapa _intentos_por_equipo
                     var entry_intentos_por_equipo = this._intentos_por_equipo.get(subData.equipo)
                     var entry_intentos_por_equipo_problema : number | undefined = 0;
                     if(entry_intentos_por_equipo!=undefined) {
@@ -160,9 +177,16 @@ class EventFactory {
                             throw "Error interno, no existe la entrada '"+subData.problema+"' en el mapa de intentos por equipo/problema";
                     } else throw "Error interno, no existe la entrada '"+subData.equipo+"' en el mapa de intentos por equipo";
                     
-                    //TODO: cambiar el ACs hardcodeadedo, utilizando la entidad judgement_type
+                    //Entrada del mapa _judgement_types
+                    var entry_judgement_type = this._judgement_types.get(evJud.judgement_type_id);
+                    if(entry_judgement_type==undefined) throw "Error interno, no existe la entrada '"+evJud.judgement_type_id+"' en el mapa de tipos de veredicto";
 
-                    if(evJud.judgement_type_id=="AC"){
+                    //Se suma 1 al número de intentos, pero solo si el veredizto penaliza (en muchos casos CE no penaliza), o es el intento que resuelve el problema
+                    if(entry_judgement_type.resuelto || entry_judgement_type.penaliza)
+                        entry_intentos_por_equipo.set(subData.problema, entry_intentos_por_equipo_problema = entry_intentos_por_equipo_problema + 1)
+
+                    //Se comprueba si se ha resuelto el problema
+                    if(entry_judgement_type.resuelto){
                         //Se pasa a negativo para indicar que el problema ha sido resuelto
                         entry_intentos_por_equipo.set(subData.problema,entry_intentos_por_equipo_problema=-entry_intentos_por_equipo_problema);
                     }

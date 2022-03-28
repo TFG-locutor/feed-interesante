@@ -31,7 +31,7 @@ class PtoVistaProblem extends PuntoDeVista{
                 break;
             case "veredicto":
                 var evVer = evento as EventoVeredicto;
-                this.emitir("El resultado del envío "+evVer.id_envio+" ha sido "+evVer.resultado );
+                this.emitir("El resultado del envío "+evVer.id_envio+" ha sido "+evVer.resultado+ ", lleva "+evVer.n_intento+" intentos" );
                 if(evVer.resultado=="AC"){
                     if(!this._ha_sido_resuelto) {
                         this._ha_sido_resuelto = true;
