@@ -12,7 +12,7 @@ import { EventoVeredicto } from "./Custom/EventoVeredicto";
 import { EventoEnvio } from "./Custom/EventoEnvio";
 import { ContestEvent } from "./ContestsEvent";
 import { LanguageEvent } from "./LanguageEvent";
-import { stringify } from "querystring";
+import { ManagerPuntosDeVista } from "../PuntosDeVista/ManagerPuntosDeVista";
 
 type TSubData = {
     equipo:string;
@@ -23,29 +23,21 @@ type TJudTypeData = {
     nombre: string;
     penaliza: boolean;
     resuelto: boolean;
-}
+};
+
+type TProblemData = {
+    nombre: string;
+};
+
+type TEquipoData = {
+    nombre: string;
+};
 
 //singleton
 class EventFactory {
 
     //Istancia del singleton
     private static instance: EventFactory;
-
-    //asocia el id de un equipo a su nombre
-    _nombre_equipo: Map<string,string>;
-    private getTeamName(id: string) : string {
-        var nomEquipo = this._nombre_equipo.get(id);
-        if(nomEquipo==undefined) nomEquipo="unknown team name";
-        return nomEquipo;
-    }
-
-    //asocia el id de un problema a su nombre
-    _nombre_problema: Map<string,string>;
-    private getProblemName(id: string) : string {
-        var nomProblema = this._nombre_problema.get(id);
-        if(nomProblema==undefined) nomProblema="unknown problem name";
-        return nomProblema;
-    }
 
     //asocia el id de un equipo y el id de un problema a los intentos (negativo si AC)
     //this._intentos_por_equipo[id_equipo][id_problema]
@@ -57,12 +49,28 @@ class EventFactory {
     //Asocia un id a un tipo de submission
     _judgement_types: Map<string,TJudTypeData>;
 
+    //Asocia un id a los datos de un problema
+    _problemas: Map<string,TProblemData>;
+    private getProblemName(id: string) : string {
+        var problema = this._problemas.get(id);
+        if(problema==undefined || problema.nombre == undefined) return "unknown problem name";
+        return problema.nombre;
+    }
+
+    //Asocia un id a los datos de un equipo
+    _equipos: Map<string,TEquipoData>;
+    private getTeamName(id: string) : string {
+        var equipo = this._equipos.get(id);
+        if(equipo==undefined || equipo.nombre==undefined) return "unknown team name";
+        return equipo.nombre;
+    }
+
     private constructor() {
         this._intentos_por_equipo = new Map<string,Map<string,number>>();
         this._pending_submissions = new Map<string,TSubData>();
-        this._nombre_equipo = new Map<string,string>();
-        this._nombre_problema = new Map<string,string>();
         this._judgement_types = new Map<string,TJudTypeData>();
+        this._problemas = new Map<string,TProblemData>();
+        this._equipos = new Map<string,TEquipoData>();
     }
 
     public static getInstance() : EventFactory {
@@ -95,7 +103,7 @@ class EventFactory {
             case "problems": return new ProblemEvent(json.data, json.op);
             case "submissions": return new SubmissionEvent(json.data, json.op);
             case "teams": return new TeamEvent(json.data, json.op);
-            case "runs": case "state":return null;
+            case "runs": case "state": return null;//new DummyEvent();
             default: throw "Evento no reconocido: "+json.type;
         }
 
@@ -104,23 +112,31 @@ class EventFactory {
     //función que recive un evento, e intenta reemitirlo con información simplificada
     //la idea es reducir la lógica dentro de los puntos de vista
     //Si no se puede hacer nada, se devuelve tal y como está
-    public static ProcesarYEnriquecerEvento (ev: Evento | null) : Evento | null {
+    public static ProcesarYEnriquecerEvento (ev: Evento) : Evento | null {
         return EventFactory.getInstance().ProcesarYEnriquecerEvento(ev);
     }
-    public ProcesarYEnriquecerEvento (ev: Evento | null) : Evento | null {
+    public ProcesarYEnriquecerEvento (ev: any) : Evento | null {
         if(ev==undefined||ev==null||ev.tipo==undefined) return ev;
-
+        //console.log(ev);
         switch(ev.tipo) {
             case "problem":
-                let evPro = ev as ProblemEvent; 
+                let evPro = ev as ProblemEvent;
+                //console.log(evPro);
                 if(evPro.op=="create"||evPro.op=="update") {
-                    this._nombre_problema.set(evPro.id, evPro.name);
+                    if(evPro.op=="create") {
+                        //ManagerPuntosDeVista.registrarPuntoDeVistaProblema(evPro.id);
+                    }
+                    this._problemas.set(evPro.id, { nombre: evPro.name });
                 }
                 break;
             case "team":
                 let evTea = ev as TeamEvent; 
                 if(evTea.op=="create"||evTea.op=="update") {
-                    this._nombre_equipo.set(evTea.id, evTea.display_name);
+                    if(this._equipos.get(evTea.id)==undefined) {//if(evTea.op=="create") {
+                        //El problema es nuevo, hay que crear un punto de vista
+                        //ManagerPuntosDeVista.registrarPuntoDeVistaEquipo(evTea.id);
+                    }
+                    this._equipos.set(evTea.id, {nombre: evTea.display_name});
                 }
                 break;
             case "submission":
@@ -202,7 +218,7 @@ class EventFactory {
                 break;
         }
 
-        return null;
+        return null;//new DummyEvent();
     }
 
 }

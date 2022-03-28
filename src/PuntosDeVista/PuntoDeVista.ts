@@ -1,4 +1,4 @@
-import { Evento } from "./Eventos/Evento";
+import { Evento } from "../Eventos/Evento";
 import { Observable } from 'rxjs';
 
 abstract class PuntoDeVista {

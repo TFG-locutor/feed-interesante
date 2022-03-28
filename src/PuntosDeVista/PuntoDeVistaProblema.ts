@@ -3,18 +3,19 @@ import { Observable } from "rxjs";
 import { EventoEnvio } from "../Eventos/Custom/EventoEnvio";
 import { EventoVeredicto } from "../Eventos/Custom/EventoVeredicto";
 import { Evento } from "../Eventos/Evento";
-import { PuntoDeVista } from "../PuntoDeVista";
+import { PuntoDeVista } from "./PuntoDeVista";
 
-class PtoVistaProblem extends PuntoDeVista{
+class PuntoDeVistaProblema extends PuntoDeVista{
     
 
     _id_problema : string;
     _ha_sido_resuelto : boolean;
 
-    constructor( eventFeed : Observable<any>, id_problema : string ) {
+    constructor( eventFeed : Observable<Evento>, id_problema : string ) {
         super( eventFeed );
         this._id_problema = id_problema;
         this._ha_sido_resuelto = false;
+        console.log("Creado punto de vista del problema "+this._id_problema);
     }
 
     filtrar(evento: Evento): boolean {
@@ -44,5 +45,5 @@ class PtoVistaProblem extends PuntoDeVista{
     }
 };
 
-export{PtoVistaProblem};
+export{PuntoDeVistaProblema};
 

@@ -2,7 +2,7 @@
     "url": "192.168.1.152",
     "port": 80,
     "api_version": "v4",
-    "contest_id": "1234",
+    "contest_id": "ext_id_gran_concurso",
     "api_user": "apiuser",
     "api_password": "apiuser"
 }

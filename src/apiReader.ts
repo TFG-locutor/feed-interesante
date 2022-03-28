@@ -1,20 +1,16 @@
 "use strict";
 
 import { IncomingMessage } from "http";
-import { Observable, Observer, Subscriber } from "rxjs";
+import { Observable } from "rxjs";
 import { EventFactory } from "./Eventos/EventFactory";
 import { Evento } from "./Eventos/Evento";
-import { PtoVistaProblem } from "./PuntosDeVista/PtoVistaProblem";
 
 const http = require('http');
-
 
 function callbackEjemplo(evento:string) {
     console.log("Evento interesante: " + evento);
     //console.log(evento);
 }
-
-//let p1 = new PtoVistaProblem(callbackEjemplo,"script_hello_judge");
 
 class APIReader {
 
@@ -35,7 +31,7 @@ class APIReader {
     }
 
     public suscribe_to_feed(){
-        return new Observable<JSON>(suscriber =>{
+        return new Observable<Evento>(suscriber =>{
             console.log("Iniciando escucha en el servidor "+this.hostname+", puerto "+this.port);
             const options = {
                 hostname: this.hostname,
@@ -63,43 +59,53 @@ class APIReader {
                     `Expected application/x-ndjson but received ${contentType}`));
             }
             res.setEncoding('utf8');
-            let rawData = '';
+            let rawData : string = '';
             let indexData : number = 0; //El siguiente dato (carácter) a procesar
-            let numParentesis = 0; //Número de paréntesis abiertos
-            let insideComillas = false;
-            let anteriorIgualAEscape = false;
+            let numParentesis : number = 0; //Número de paréntesis abiertos
+            let insideComillas : boolean = false;
+            let anteriorIgualAEscape : boolean = false;
             res.on('data', (chunk : any) => {
+
+                if((/^\n$/).test(chunk)) {
+                    console.log("...");
+                    return;
+                }
+
                 rawData += chunk;
                 
                 for(;indexData<rawData.length;++indexData) {
                     var ch = rawData.charAt(indexData);
-                    if(!anteriorIgualAEscape && ch=='"') insideComillas = !insideComillas;
+                    if(!anteriorIgualAEscape && ch==='"') insideComillas = !insideComillas;
                     anteriorIgualAEscape = (/\\/).test(ch);
                     if(insideComillas) continue;
                     if(ch=='{') ++numParentesis;
                     if(ch=='}') --numParentesis;
-                    //let specialCharacter:string = "\\";
                     
-                    if(anteriorIgualAEscape) console.log("anterioresxcape")
-                    if(numParentesis==0) {
+                    if(numParentesis===0) {
                         
                         let dataSTR = rawData.substring(0,indexData+1);
+                        //console.log("dataSTR:"+dataSTR)
                         rawData = rawData.substring(indexData+1);
-                        indexData = 0;
+                        indexData = -1;
+                        insideComillas = false;
+                        anteriorIgualAEscape = false;
+                        //Si se trata solo de un salto de linea, se ignora
+                        if(/^\n$/.test(dataSTR)) continue;
                         let obj : JSON;
                         try{
                             obj = JSON.parse(dataSTR);
                             //console.log(obj)
-                            suscriber.next(obj);
-                            /* var ev = EventFactory.obtenerEventoDesdeJSON(obj);
+                            //suscriber.next(obj);
+                            var ev = EventFactory.obtenerEventoDesdeJSON(obj);
                             if(ev!=null) {
-                                p1.procesar(ev);
+                                suscriber.next(ev);
                                 ev = EventFactory.ProcesarYEnriquecerEvento(ev);
-                                if(ev!=null) p1.procesar(ev);
-                            } */
+                                if(ev!=null) suscriber.next(ev);
+                            }
                         } catch( e : any ) {
-                            if(e.constructor.name!="SyntaxError") console.log("[ERROR]: " + e);
-                            else console.log("..."); 
+                            //if(e.constructor.name!="SyntaxError")
+                                console.log("[ERROR]: " + e);
+                            //else console.log("..."); 
                         }
                     }
                 }

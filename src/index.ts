@@ -3,7 +3,9 @@ import { APIReader } from "./apiReader";
 import { Configuration, ConfigurationLoader } from "./config";
 import { concatMap, filter, map, mergeMap, Observable, onErrorResumeNext, share } from 'rxjs';
 import { EventFactory } from "./Eventos/EventFactory";
-import { PtoVistaProblem } from "./PuntosDeVista/PtoVistaProblem";
+import { ManagerPuntosDeVista } from "./PuntosDeVista/ManagerPuntosDeVista";
+import { PuntoDeVistaProblema } from "./PuntosDeVista/PuntoDeVistaProblema";
+import { Evento } from "./Eventos/Evento";
 
 console.log("Iniciando Programa...");
 
@@ -15,15 +17,18 @@ try{
     let apiReader = new APIReader(conf.url, conf.port, conf.contest_id, conf.api_version, conf.api_user, conf.api_password);
     
     //apiReader.start_listen();
-    let obs = apiReader.suscribe_to_feed().pipe(
+
+    var obs = apiReader.suscribe_to_feed().pipe(
         share(), //una misma ejecucion de la request
-        map(obj=>EventFactory.obtenerEventoDesdeJSON(obj)),
-        concatMap(async (e) => EventFactory.ProcesarYEnriquecerEvento(e)),
+        //map(obj=>EventFactory.obtenerEventoDesdeJSON(obj)),
+        //concatMap((e) => new Observable<Evento>((subscriber)=>{
+        //    subscriber.next(EventFactory.ProcesarYEnriquecerEvento(e));
+        //})),
         filter(e=> e!==null),
-        );
+    );
 
-    let p1 = new PtoVistaProblem(obs,"script_hello_judge"); 
-
+    //var p1 = new PuntoDeVistaProblema(obs,"script_hello_judge")
+    ManagerPuntosDeVista.setObservable(obs);
 
 
 } catch (err) {
