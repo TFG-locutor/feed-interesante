@@ -53,6 +53,7 @@ class PuntoDeVistaTiempo extends PuntoDeVista {
                         //this.comunicarMarcadorCongelado();
                     //Probando otra cosa: solo si 
                     this.marcadorCongeladoComunicado = this.freezeTime.isSameOrBefore(evCon.moment);
+                    if(!this.marcadorCongeladoComunicado) console.log("Marcador descongelado")
                     //if(!this.marcadorCongeladoComunicado) this.comunicarMarcadorCongelado();
                     
                 }
