@@ -18,8 +18,8 @@ class GroupEvent extends Evento {
     sortorder!: number;
     color!: string;
 
-    constructor(json : any, op: string) {
-        super(op, "group", json, ["id","hidden","icpc_id","name","sortorder","color"]);
+    constructor(json : any, op: string, _moment: string) {
+        super(op, "group", _moment, json, ["id","hidden","icpc_id","name","sortorder","color"]);
     }
 
 }

@@ -14,8 +14,8 @@ class JudgementTypeEvent extends Evento {
     penalty!: boolean;
     solved!: boolean;
 
-    constructor(json : any, op: string) {
-        super(op, "judgement_type", json, ["id","name","penalty","solved"]);
+    constructor(json : any, op: string, _moment: string) {
+        super(op, "judgement_type", _moment, json, ["id","name","penalty","solved"]);
     }
 
 }

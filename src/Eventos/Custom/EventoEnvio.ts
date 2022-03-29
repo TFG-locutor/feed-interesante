@@ -12,8 +12,8 @@ class EventoEnvio extends Evento {
     id_problema: string;
     problema: string;
 
-    constructor(id_envio: string, id_equipo:string, equipo: string, id_problema: string, problema: string) {
-        super("create","envio",null,[]);
+    constructor(_moment: string, id_envio: string, id_equipo:string, equipo: string, id_problema: string, problema: string) {
+        super("create","envio",_moment,null,[]);
         this.id_envio = id_envio;
         this.id_equipo = id_equipo;
         this.equipo = equipo;

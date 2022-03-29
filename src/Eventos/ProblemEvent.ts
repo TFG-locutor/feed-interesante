@@ -24,10 +24,10 @@ class ProblemEvent extends Evento {
     time_limit!: number;
     test_data_count!: number;
 
-    constructor(json : any, op: string) {
+    constructor(json : any, op: string, _moment: string) {
         //console.log(op);
         //console.log(json);
-        super(op, "problem", json, ["id",/*"label",*//*"short_name",*/"name","ordinal",/*"rgb","color",*/"time_limit","test_data_count"]);
+        super(op, "problem", _moment, json, ["id",/*"label",*//*"short_name",*/"name","ordinal",/*"rgb","color",*/"time_limit","test_data_count"]);
     }
 
 }

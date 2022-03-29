@@ -2,6 +2,7 @@ import { Observable } from "rxjs"
 import { Evento } from "../Eventos/Evento";
 import { PuntoDeVistaProblema } from "./PuntoDeVistaProblema";
 import { PuntoDeVista } from "./PuntoDeVista";
+import { PuntoDeVistaTiempo } from "./PuntoDeVistaTiempo";
 
 //Antes de llamar a getInstance es necesario llamar a setObservable una única vez
 class ManagerPuntosDeVista {
@@ -40,6 +41,8 @@ class ManagerPuntosDeVista {
         this.viewpoint_data.push( new PuntoDeVistaProblema(ManagerPuntosDeVista.obs, "script_hello_judge") );
         this.viewpoint_data.push( new PuntoDeVistaProblema(ManagerPuntosDeVista.obs, "ext-p-1") );
         this.viewpoint_data.push( new PuntoDeVistaProblema(ManagerPuntosDeVista.obs, "ext-prob-2") );
+        
+        this.viewpoint_data.push( new PuntoDeVistaTiempo(ManagerPuntosDeVista.obs) );
     }
 
     public static registrarPuntoDeVistaProblema(id_problema: string) {

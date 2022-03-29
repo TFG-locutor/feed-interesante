@@ -35,8 +35,8 @@ class OrganizationEvent extends Evento {
     }];
     */
 
-    constructor(json : any, op: string) {
-        super(op, "organization", json, ["id","shortname","icpc_id","name","formal_name","country","logo"]);
+    constructor(json : any, op: string, _moment: string) {
+        super(op, "organization", _moment, json, ["id","shortname","icpc_id","name","formal_name","country","logo"]);
     }
 
 }

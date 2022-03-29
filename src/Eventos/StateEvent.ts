@@ -11,15 +11,15 @@ import { Evento } from "./Evento";
 
 class StateEvent extends Evento {
 
-    started!: string;
-    ended!: string;
-    frozen!: string;
-    thawed!: string;
-    finalized!: string;
+    started!: moment.Moment;
+    ended!: moment.Moment;
+    frozen!: moment.Moment;
+    thawed!: moment.Moment;
+    finalized!: moment.Moment;
     end_of_updates!: string;
 
-    constructor(json : any, op: string) {
-        super(op, "language", json, ["started","ended","frozen","thawed","finalized","end_of_updates"]);
+    constructor(json : any, op: string, _moment: string) {
+        super(op, "state", _moment, json, ["started@moment","ended@moment","frozen@moment","thawed@moment","finalized@moment","end_of_updates"]);
     }
 
 }

@@ -2,6 +2,7 @@
 
 import { IncomingMessage } from "http";
 import { Observable } from "rxjs";
+import { EventoBump } from "./Eventos/Custom/EventoBump";
 import { EventFactory } from "./Eventos/EventFactory";
 import { Evento } from "./Eventos/Evento";
 
@@ -48,83 +49,85 @@ class APIReader {
                 }
             }
 
-        http.get(options, ( res : IncomingMessage) => {
-            const { statusCode} = res;
-            const contentType:any = res.headers['content-type'];
-            if (statusCode !== 200) {
-                suscriber.error( new Error('Request Failed.\n' +
-                    `Status Code: ${statusCode}`));
-            } else if (!/^application\/x-ndjson/.test(contentType)) {
-                suscriber.error(new Error('Invalid content-type.\n' +
-                    `Expected application/x-ndjson but received ${contentType}`));
-            }
-            res.setEncoding('utf8');
-            let rawData : string = '';
-            let indexData : number = 0; //El siguiente dato (carácter) a procesar
-            let numParentesis : number = 0; //Número de paréntesis abiertos
-            let insideComillas : boolean = false;
-            let anteriorIgualAEscape : boolean = false;
-            res.on('data', (chunk : any) => {
-
-                if((/^\n$/).test(chunk)) {
-                    console.log("...");
-                    return;
+            http.get(options, ( res : IncomingMessage) => {
+                const { statusCode} = res;
+                const contentType:any = res.headers['content-type'];
+                if (statusCode !== 200) {
+                    suscriber.error( new Error('Request Failed.\n' +
+                        `Status Code: ${statusCode}`));
+                } else if (!/^application\/x-ndjson/.test(contentType)) {
+                    suscriber.error(new Error('Invalid content-type.\n' +
+                        `Expected application/x-ndjson but received ${contentType}`));
                 }
+                res.setEncoding('utf8');
+                let rawData : string = '';
+                let indexData : number = 0; //El siguiente dato (carácter) a procesar
+                let numParentesis : number = 0; //Número de paréntesis abiertos
+                let insideComillas : boolean = false;
+                let anteriorIgualAEscape : boolean = false;
+                res.on('data', (chunk : any) => {
 
-                rawData += chunk;
-                
-                for(;indexData<rawData.length;++indexData) {
-                    var ch = rawData.charAt(indexData);
-                    if(!anteriorIgualAEscape && ch==='"') insideComillas = !insideComillas;
-                    anteriorIgualAEscape = (/\\/).test(ch);
-                    if(insideComillas) continue;
-                    if(ch=='{') ++numParentesis;
-                    if(ch=='}') --numParentesis;
+                    suscriber.next(new EventoBump("null"));
+
+                    if((/^\n$/).test(chunk)) {
+                        console.log("...");
+                        return;
+                    }
+
+                    rawData += chunk;
                     
-                    if(numParentesis===0) {
+                    for(;indexData<rawData.length;++indexData) {
+                        var ch = rawData.charAt(indexData);
+                        if(!anteriorIgualAEscape && ch==='"') insideComillas = !insideComillas;
+                        anteriorIgualAEscape = (/\\/).test(ch);
+                        if(insideComillas) continue;
+                        if(ch=='{') ++numParentesis;
+                        if(ch=='}') --numParentesis;
                         
-                        let dataSTR = rawData.substring(0,indexData+1);
-                        //console.log("dataSTR:"+dataSTR)
-                        rawData = rawData.substring(indexData+1);
-                        indexData = -1;
-                        insideComillas = false;
-                        anteriorIgualAEscape = false;
-                        //Si se trata solo de un salto de linea, se ignora
-                        if(/^\n$/.test(dataSTR)) continue;
-                        let obj : JSON;
-                        try{
-                            obj = JSON.parse(dataSTR);
-                            //console.log(obj)
-                            //suscriber.next(obj);
-                            var ev = EventFactory.obtenerEventoDesdeJSON(obj);
-                            if(ev!=null) {
-                                suscriber.next(ev);
-                                ev = EventFactory.ProcesarYEnriquecerEvento(ev);
-                                if(ev!=null) suscriber.next(ev);
+                        if(numParentesis===0) {
+                            
+                            let dataSTR = rawData.substring(0,indexData+1);
+                            //console.log("dataSTR:"+dataSTR)
+                            rawData = rawData.substring(indexData+1);
+                            indexData = -1;
+                            insideComillas = false;
+                            anteriorIgualAEscape = false;
+                            //Si se trata solo de un salto de linea, se ignora
+                            if(/^\n$/.test(dataSTR)) continue;
+                            let obj : JSON;
+                            try{
+                                obj = JSON.parse(dataSTR);
+                                //console.log(obj)
+                                //suscriber.next(obj);
+                                var ev = EventFactory.obtenerEventoDesdeJSON(obj);
+                                if(ev!=null) {
+                                    suscriber.next(ev);
+                                    ev = EventFactory.ProcesarYEnriquecerEvento(ev);
+                                    if(ev!=null) suscriber.next(ev);
+                                }
+                            } catch( e : any ) {
+                                //if(e.constructor.name!="SyntaxError")
+                                    console.log("[ERROR]: " + e);
+                                //else console.log("..."); 
                             }
-                        } catch( e : any ) {
-                            //if(e.constructor.name!="SyntaxError")
-                                console.log("[ERROR]: " + e);
-                            //else console.log("..."); 
                         }
                     }
-                }
+                });
+                res.on('end', () => {
+                    /* try {
+                        console.log("---FIN---\n");
+                        const parsedData = JSON.parse(rawData);
+                        console.log(parsedData);
+                    } catch (e:any) {
+                        console.error(e.message);
+                    } */
+                    suscriber.complete();
+                });
+            
+            }).on("error", (err : Error) => {
+                suscriber.error(err)
             });
-            res.on('end', () => {
-                /* try {
-                    console.log("---FIN---\n");
-                    const parsedData = JSON.parse(rawData);
-                    console.log(parsedData);
-                } catch (e:any) {
-                    console.error(e.message);
-                } */
-                suscriber.complete();
-            });
-        
-        }).on("error", (err : Error) => {
-            suscriber.error(err)
-        });
-    })
+        })
     }
 
     public start_listen() {

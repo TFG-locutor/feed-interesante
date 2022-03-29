@@ -21,15 +21,15 @@ class SubmissionEvent extends Evento {
 
     id!: string;
     language_id!: string;
-    time!: string;
+    time!: moment.Moment;
     contest_time!: string;
     team_id!: string;
     problem_id!: string;
     external_id!: string;
     entry_point!: string;
 
-    constructor(json : any, op: string) {
-        super(op, "submission", json, ["id","language_id","time","contest_time","team_id","problem_id","external_id","entry_point"]);
+    constructor(json : any, op: string, _moment: string) {
+        super(op, "submission", _moment, json, ["id","language_id","time@moment","contest_time","team_id","problem_id","external_id","entry_point"]);
     }
     
 }

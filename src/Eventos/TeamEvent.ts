@@ -42,8 +42,8 @@ class TeamEvent extends Evento {
     } ];
     */
 
-    constructor(json : any, op: string) {
-        super(op, "team", json, ["id","organization_id","group_ids","affiliation","nationality","icpc_id","name","display_name","members"/*,"photo"*/]);
+    constructor(json : any, op: string, _moment: string) {
+        super(op, "team", _moment, json, ["id","organization_id","group_ids","affiliation","nationality","icpc_id","name","display_name","members"/*,"photo"*/]);
     }
 
 }

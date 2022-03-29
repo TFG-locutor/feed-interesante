@@ -84,7 +84,7 @@ class EventFactory {
     }
     public obtenerEventoDesdeJSON(json: any) : Evento | null {
 
-        //console.log(json);
+        //console.log(json.data);
 
         if(json==undefined||json==null) throw "JSON no existente. No se puede crear la estructura del evento";
         for(var field of ["type","op","data"]) {
@@ -93,16 +93,16 @@ class EventFactory {
         }
 
         switch(json.type) {
-            case "contests": return new ContestEvent(json.data, json.op);
-            case "clarifications": return new ClarificationEvent(json.data, json.op);
-            case "groups": return new GroupEvent(json.data, json.op);
-            case "judgements": return new JudgementEvent(json.data, json.op);
-            case "judgement-types": return new JudgementTypeEvent(json.data, json.op);
-            case "languages": return new LanguageEvent(json.data, json.op);
-            case "organizations": return new OrganizationEvent(json.data, json.op);
-            case "problems": return new ProblemEvent(json.data, json.op);
-            case "submissions": return new SubmissionEvent(json.data, json.op);
-            case "teams": return new TeamEvent(json.data, json.op);
+            case "contests": return new ContestEvent(json.data, json.op, json.time);
+            case "clarifications": return new ClarificationEvent(json.data, json.op, json.time);
+            case "groups": return new GroupEvent(json.data, json.op, json.time);
+            case "judgements": return new JudgementEvent(json.data, json.op, json.time);
+            case "judgement-types": return new JudgementTypeEvent(json.data, json.op, json.time);
+            case "languages": return new LanguageEvent(json.data, json.op, json.time);
+            case "organizations": return new OrganizationEvent(json.data, json.op, json.time);
+            case "problems": return new ProblemEvent(json.data, json.op, json.time);
+            case "submissions": return new SubmissionEvent(json.data, json.op, json.time);
+            case "teams": return new TeamEvent(json.data, json.op, json.time);
             case "runs": case "state": return null;//new DummyEvent();
             default: throw "Evento no reconocido: "+json.type;
         }
@@ -115,7 +115,7 @@ class EventFactory {
     public static ProcesarYEnriquecerEvento (ev: Evento) : Evento | null {
         return EventFactory.getInstance().ProcesarYEnriquecerEvento(ev);
     }
-    public ProcesarYEnriquecerEvento (ev: any) : Evento | null {
+    public ProcesarYEnriquecerEvento (ev: Evento) : Evento | null {
         if(ev==undefined||ev==null||ev.tipo==undefined) return ev;
         //console.log(ev);
         switch(ev.tipo) {
@@ -161,6 +161,7 @@ class EventFactory {
                     //Se añade el envío a la lista de envios pendientes de procesar
                     this._pending_submissions.set(evSub.id, {equipo: evSub.team_id, problema: evSub.problem_id});
                     return new EventoEnvio(
+                        evSub.moment.format(),
                         evSub.id,
                         eq, this.getTeamName(eq),
                         evSub.problem_id, this.getProblemName(evSub.problem_id)
@@ -208,6 +209,7 @@ class EventFactory {
                     }
                     
                     return new EventoVeredicto(
+                        evJud.moment.format(),
                         evJud.submission_id,
                         subData.equipo, this.getTeamName(subData.equipo),
                         subData.problema, this.getProblemName(subData.problema),
