@@ -13,6 +13,8 @@ import { EventoEnvio } from "./Custom/EventoEnvio";
 import { ContestEvent } from "./ContestsEvent";
 import { LanguageEvent } from "./LanguageEvent";
 import { ManagerPuntosDeVista } from "../PuntosDeVista/ManagerPuntosDeVista";
+import { CambioEstado, EventoCambioEstado, TipoCambioEstado } from "./Custom/EventoCambioEstado";
+import moment from "moment";
 
 type TSubData = {
     equipo:string;
@@ -65,12 +67,28 @@ class EventFactory {
         return equipo.nombre;
     }
 
+    //Marcadores para los cambios de estado del concurso
+    
+    sb_freeze_duration : string | null;
+
+    contest_start : moment.Moment | null;
+    freezeTime : moment.Moment | null;
+    contest_end : moment.Moment | null;
+
+    comunicados : Map<CambioEstado,boolean>;
+
     private constructor() {
         this._intentos_por_equipo = new Map<string,Map<string,number>>();
         this._pending_submissions = new Map<string,TSubData>();
         this._judgement_types = new Map<string,TJudTypeData>();
         this._problemas = new Map<string,TProblemData>();
         this._equipos = new Map<string,TEquipoData>();
+
+        this.sb_freeze_duration = null;
+        this.contest_start = null;
+        this.contest_end = null;
+        this.freezeTime = null;
+        this.comunicados = new Map<CambioEstado,boolean>();
     }
 
     public static getInstance() : EventFactory {
@@ -112,13 +130,122 @@ class EventFactory {
     //función que recive un evento, e intenta reemitirlo con información simplificada
     //la idea es reducir la lógica dentro de los puntos de vista
     //Si no se puede hacer nada, se devuelve tal y como está
-    public static ProcesarYEnriquecerEvento (ev: Evento) : Evento | null {
+    public static ProcesarYEnriquecerEvento (ev: Evento) : Array<Evento> {
         return EventFactory.getInstance().ProcesarYEnriquecerEvento(ev);
     }
-    public ProcesarYEnriquecerEvento (ev: Evento) : Evento | null {
-        if(ev==undefined||ev==null||ev.tipo==undefined) return ev;
+    public ProcesarYEnriquecerEvento (ev: Evento) : Array<Evento> {
+        if(ev==undefined||ev==null||ev.tipo==undefined) return [];
         //console.log(ev);
+        var eventos = new Array<Evento>();
+        /////////////////////////////
+        //Primero se simula el bump//
+        /////////////////////////////
+        //console.log("bump")
+        let ajusteTiempoBump : moment.Moment = ev.moment; // = moment();
+        //ajusteTiempoBump.add(1,"second");
+        //Cambios en el estado del concurso (empieza, acaba, se congela)
+        if(!this.comunicados.get(CambioEstado.ConcursoIniciado) && this.contest_start!=null && this.contest_start.isSameOrBefore(ajusteTiempoBump)) {
+            this.comunicados.set(CambioEstado.ConcursoIniciado, true);
+            eventos.push(new EventoCambioEstado(
+                "null",
+                CambioEstado.ConcursoIniciado,
+                TipoCambioEstado.Normal
+            ));
+        }
+        if(!this.comunicados.get(CambioEstado.ConcursoFinalizado) && this.contest_end!=null && this.contest_end.isSameOrBefore(ajusteTiempoBump)) {
+            this.comunicados.set(CambioEstado.ConcursoFinalizado, true);
+            eventos.push(new EventoCambioEstado(
+                "null",
+                CambioEstado.ConcursoFinalizado,
+                TipoCambioEstado.Normal
+            ));
+        }
+        //console.log(this.comunicados.get(CambioEstado.MarcadorCongelado) + " - " + this.freezeTime + " - " + ajusteTiempoBump);
+        if(!this.comunicados.get(CambioEstado.MarcadorCongelado) && this.freezeTime!=null && this.freezeTime.isSameOrBefore(ajusteTiempoBump)) {
+            this.comunicados.set(CambioEstado.MarcadorCongelado, true);
+            eventos.push(new EventoCambioEstado(
+                "null",
+                CambioEstado.MarcadorCongelado,
+                TipoCambioEstado.Normal
+            ));
+        }
+        ////////////////////////////////////
+        //Luego se procesa el evento en si//
+        ////////////////////////////////////
         switch(ev.tipo) {
+            case "contest":
+                //No se comprueba que la operación no sea de tipo delete, porque en ese caso tienes problemas más grandes (el concurso que estabas locutando ya no existe)
+                var evCon = ev as ContestEvent;
+                //console.log(evCon)
+                this.sb_freeze_duration = evCon.scoreboard_freeze_duration;
+                this.contest_end = evCon.end_time;
+                this.contest_start = evCon.start_time;
+                //El concurso no había empezado pero la nueva fecha de inicio implica que empezó en el pasado
+                if(this.contest_start!=null && !this.comunicados.get(CambioEstado.ConcursoIniciado) && this.contest_start.isSameOrBefore(evCon.moment) ) {
+                    this.comunicados.set( CambioEstado.ConcursoIniciado , true );
+                    //El concurso empieza
+                    eventos.push(new EventoCambioEstado(
+                        evCon.moment.format(),
+                        CambioEstado.ConcursoIniciado,
+                        TipoCambioEstado.Normal
+                    ));
+                } else //El concurso empezó en el pasado pero la nueva fecha de inicio implica que empezará en el futuro
+                if(this.contest_start!=null && this.comunicados.get(CambioEstado.ConcursoIniciado) && this.contest_start.isAfter(evCon.moment) ) {
+                    this.comunicados.set( CambioEstado.ConcursoIniciado , false );
+                    //El concurso ha dejado de haber empeado, aún no ha empezado (undo empezar)
+                    eventos.push(new EventoCambioEstado(
+                        evCon.moment.format(),
+                        CambioEstado.ConcursoIniciado,
+                        TipoCambioEstado.Deshacer
+                    ));
+                }
+                //El concurso no había acabado pero la nueva fecha de fin implica que acabó en el pasado
+                if(this.contest_end!=null && !this.comunicados.get(CambioEstado.ConcursoFinalizado) && this.contest_end.isSameOrBefore(evCon.moment) ) {
+                    this.comunicados.set( CambioEstado.ConcursoFinalizado , true );
+                    //El concurso acaba
+                    eventos.push(new EventoCambioEstado(
+                        evCon.moment.format(),
+                        CambioEstado.ConcursoFinalizado,
+                        TipoCambioEstado.Normal
+                    ));
+                } else //El concurso acabó en el pasado pero la nueva fecha de fin implica que acabará en el futuro
+                if(this.contest_end!=null && this.comunicados.get(CambioEstado.ConcursoFinalizado) && this.contest_end.isAfter(evCon.moment) ) {
+                    this.comunicados.set( CambioEstado.ConcursoFinalizado , false );
+                    //El concurso ha dejado de estar acabado, sigue en marcha (undo acabar)
+                    eventos.push(new EventoCambioEstado(
+                        evCon.moment.format(),
+                        CambioEstado.ConcursoFinalizado,
+                        TipoCambioEstado.Deshacer
+                    ));
+                }
+                //Manejo de el momento de congelación
+                if(this.sb_freeze_duration!=null && this.contest_end!=null) {
+                    this.freezeTime = this.contest_end.clone();
+                    this.freezeTime.subtract(this.sb_freeze_duration);
+                    //console.log("Se ha actualizado la hora de congelado a: "+this.freezeTime.format());
+                    //console.log(this.comunicados.get(CambioEstado.MarcadorCongelado) + " - " + evCon.moment.format())
+                    //El marcador no se había congelado y ha pasado a estarlo
+                    if(!this.comunicados.get(CambioEstado.MarcadorCongelado) && this.freezeTime.isSameOrBefore(evCon.moment) ) {
+                        this.comunicados.set( CambioEstado.MarcadorCongelado , true );
+                        //Marcador congelado
+                        eventos.push(new EventoCambioEstado(
+                            evCon.moment.format(),
+                            CambioEstado.MarcadorCongelado,
+                            TipoCambioEstado.Normal
+                        ));
+                    } else //El marcador se había congelado pero ya no lo está
+                    if(this.comunicados.get(CambioEstado.MarcadorCongelado) && this.freezeTime.isAfter(evCon.moment) ) {
+                        this.comunicados.set( CambioEstado.MarcadorCongelado , false );
+                        //Marcador descongelado (undo congelar)
+                        eventos.push(new EventoCambioEstado(
+                            evCon.moment.format(),
+                            CambioEstado.MarcadorCongelado,
+                            TipoCambioEstado.Deshacer
+                        ));
+                    }
+                    
+                }
+                break;
             case "problem":
                 let evPro = ev as ProblemEvent;
                 //console.log(evPro);
@@ -160,12 +287,12 @@ class EventFactory {
 
                     //Se añade el envío a la lista de envios pendientes de procesar
                     this._pending_submissions.set(evSub.id, {equipo: evSub.team_id, problema: evSub.problem_id});
-                    return new EventoEnvio(
+                    eventos.push( new EventoEnvio(
                         evSub.moment.format(),
                         evSub.id,
                         eq, this.getTeamName(eq),
                         evSub.problem_id, this.getProblemName(evSub.problem_id)
-                    );
+                    ) );
                 }
                 break;
             case "judgement_type":
@@ -208,19 +335,19 @@ class EventFactory {
                         entry_intentos_por_equipo.set(subData.problema,entry_intentos_por_equipo_problema=-entry_intentos_por_equipo_problema);
                     }
                     
-                    return new EventoVeredicto(
+                    eventos.push( new EventoVeredicto(
                         evJud.moment.format(),
                         evJud.submission_id,
                         subData.equipo, this.getTeamName(subData.equipo),
                         subData.problema, this.getProblemName(subData.problema),
                         evJud.judgement_type_id,
                         Math.abs(entry_intentos_por_equipo_problema)
-                    );
+                    ) );
                 }
                 break;
         }
 
-        return null;//new DummyEvent();
+        return eventos;//new DummyEvent();
     }
 
 }

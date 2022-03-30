@@ -1,6 +1,7 @@
 "use strict";
 
 import { IncomingMessage } from "http";
+import moment from "moment";
 import { Observable } from "rxjs";
 import { EventoBump } from "./Eventos/Custom/EventoBump";
 import { EventFactory } from "./Eventos/EventFactory";
@@ -71,6 +72,8 @@ class APIReader {
 
                     if((/^\n$/).test(chunk)) {
                         console.log("...");
+                        var bumpSecondaryEvents = EventFactory.ProcesarYEnriquecerEvento(new EventoBump(moment().format()));
+                        for(var bumpSecondaryEvent of bumpSecondaryEvents) suscriber.next(bumpSecondaryEvent);
                         return;
                     }
 
@@ -102,8 +105,8 @@ class APIReader {
                                 var ev = EventFactory.obtenerEventoDesdeJSON(obj);
                                 if(ev!=null) {
                                     suscriber.next(ev);
-                                    ev = EventFactory.ProcesarYEnriquecerEvento(ev);
-                                    if(ev!=null) suscriber.next(ev);
+                                    var evs = EventFactory.ProcesarYEnriquecerEvento(ev);
+                                    for(var _ev of evs) suscriber.next(_ev);
                                 }
                             } catch( e : any ) {
                                 //if(e.constructor.name!="SyntaxError")
