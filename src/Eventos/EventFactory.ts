@@ -251,7 +251,7 @@ class EventFactory {
                 //console.log(evPro);
                 if(evPro.op=="create"||evPro.op=="update") {
                     if(evPro.op=="create") {
-                        //ManagerPuntosDeVista.registrarPuntoDeVistaProblema(evPro.id);
+                        ManagerPuntosDeVista.registrarPuntoDeVistaProblema(evPro.id);
                     }
                     this._problemas.set(evPro.id, { nombre: evPro.name });
                 }
@@ -261,7 +261,7 @@ class EventFactory {
                 if(evTea.op=="create"||evTea.op=="update") {
                     if(this._equipos.get(evTea.id)==undefined) {//if(evTea.op=="create") {
                         //El problema es nuevo, hay que crear un punto de vista
-                        //ManagerPuntosDeVista.registrarPuntoDeVistaEquipo(evTea.id);
+                        ManagerPuntosDeVista.registrarPuntoDeVistaEquipo(evTea.id);
                     }
                     this._equipos.set(evTea.id, {nombre: evTea.display_name});
                 }
