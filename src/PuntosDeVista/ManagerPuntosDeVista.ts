@@ -45,6 +45,10 @@ class ManagerPuntosDeVista {
         this.viewpoint_data.push( new PuntoDeVistaTiempo(ManagerPuntosDeVista.obs) );
     }
 
+    public static getviewpoint_data() : Array<PuntoDeVista> {
+        return this.instance.viewpoint_data;
+    }
+    
     public static registrarPuntoDeVistaProblema(id_problema: string) {
         ManagerPuntosDeVista.getInstance().viewpoint_data.push(
             new PuntoDeVistaProblema(ManagerPuntosDeVista.obs, id_problema)
@@ -58,6 +62,8 @@ class ManagerPuntosDeVista {
         );
         console.log("Registrado punto de vista de equipo con id "+id_equipo);
     }
+
+
 
 };
 

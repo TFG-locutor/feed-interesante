@@ -6,6 +6,9 @@ import { EventFactory } from "./Eventos/EventFactory";
 import { ManagerPuntosDeVista } from "./PuntosDeVista/ManagerPuntosDeVista";
 import { PuntoDeVistaProblema } from "./PuntosDeVista/PuntoDeVistaProblema";
 import { Evento } from "./Eventos/Evento";
+import { PuntoDeVista } from "./PuntosDeVista/PuntoDeVista";
+import { EventHandler } from "./SalidaEventos/EventHandler";
+import { EmitOnConsole } from "./SalidaEventos/EmitOnConsole";
 
 console.log("Iniciando Programa...");
 
@@ -30,6 +33,10 @@ try{
     //var p1 = new PuntoDeVistaProblema(obs,"script_hello_judge")
     ManagerPuntosDeVista.setObservable(obs);
 
+    let evHandler : EventHandler = new EmitOnConsole();
+    ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
+        evHandler.observeNewEventFeed(pv.getEventEmiter());
+    });
 
 } catch (err) {
     console.log("ERROR: "+err)

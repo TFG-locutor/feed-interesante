@@ -68,7 +68,7 @@ class APIReader {
                 let anteriorIgualAEscape : boolean = false;
                 res.on('data', (chunk : any) => {
 
-                    suscriber.next(new EventoBump("null"));
+                    //suscriber.next(new EventoBump("null"));
 
                     if((/^\n$/).test(chunk)) {
                         console.log("...");
