@@ -22,6 +22,8 @@ abstract class PuntoDeVista {
 
     emitir(mensaje:String): void {
         this.eventEmiter.next(mensaje);
+        //TODO borrar
+        console.log(mensaje)
     }
     
     procesar( evento : Evento ) : void {
