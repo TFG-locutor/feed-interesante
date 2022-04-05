@@ -15,7 +15,7 @@ class PuntoDeVistaProblema extends PuntoDeVista{
         super( eventFeed );
         this._id_problema = id_problema;
         this._ha_sido_resuelto = false;
-        console.log("Creado punto de vista del problema "+this._id_problema);
+        //console.log("Creado punto de vista del problema "+this._id_problema);
     }
 
     filtrar(evento: Evento): boolean {

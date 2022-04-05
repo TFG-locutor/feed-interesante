@@ -249,7 +249,7 @@ class EventFactory {
             case "problem":
                 let evPro = ev as ProblemEvent;
                 //console.log(evPro);
-                if(evPro.op=="create"||evPro.op=="update") {
+                if((evPro.op=="create" && !this._problemas.has(evPro.id))||evPro.op=="update") {
                     if(evPro.op=="create") {
                         ManagerPuntosDeVista.registrarPuntoDeVistaProblema(evPro.id);
                     }
@@ -258,7 +258,7 @@ class EventFactory {
                 break;
             case "team":
                 let evTea = ev as TeamEvent; 
-                if(evTea.op=="create"||evTea.op=="update") {
+                if((evTea.op=="create" && !this._equipos.has(evTea.id))||evTea.op=="update") {
                     if(this._equipos.get(evTea.id)==undefined) {//if(evTea.op=="create") {
                         //El problema es nuevo, hay que crear un punto de vista
                         ManagerPuntosDeVista.registrarPuntoDeVistaEquipo(evTea.id);

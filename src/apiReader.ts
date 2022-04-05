@@ -34,7 +34,7 @@ class APIReader {
     }
 
 
-    public suscribe_feed( eventEmiter : Subject<Evento>) {
+    public suscribe_feed(eventEmiter : Subject<Evento>) {
 
             console.log("Iniciando escucha en el servidor "+this.hostname+", puerto "+this.port);
             const options = {

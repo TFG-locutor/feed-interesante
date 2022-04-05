@@ -19,22 +19,25 @@ try{
     let conf : Configuration = ConfigurationLoader.load();
 
     let eventEmiter : Subject<Evento> = new Subject<Evento>();
-
     let apiReader = new APIReader(conf.url, conf.port, conf.contest_id, conf.api_version, conf.api_user, conf.api_password);
     
-    apiReader.suscribe_feed(eventEmiter);
+    
+    ManagerPuntosDeVista.setObservable(eventEmiter.asObservable());
+    ManagerPuntosDeVista.emitCreationEvents(eventEmiter);
 
-    var obs = eventEmiter.asObservable().pipe(
+    /* var obs = eventEmiter.asObservable().pipe(
         share(), //una misma ejecucion de la request
         //map(obj=>EventFactory.obtenerEventoDesdeJSON(obj)),
         //concatMap((e) => new Observable<Evento>((subscriber)=>{
         //    subscriber.next(EventFactory.ProcesarYEnriquecerEvento(e));
         //})),
         filter(e=> e!==null),
-    );
+    ); */
 
     //var p1 = new PuntoDeVistaProblema(obs,"script_hello_judge")
-    ManagerPuntosDeVista.configurateInitialViewpoints();
+
+    apiReader.suscribe_feed(eventEmiter);
+
 
     let evHandler : EventHandler = new EmitOnConsole();
     ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{

@@ -5,6 +5,7 @@ import { PuntoDeVista } from "./PuntoDeVista";
 import { PuntoDeVistaTiempo } from "./PuntoDeVistaTiempo";
 import { IncomingMessage } from "http";
 import { EventFactory } from "../Eventos/EventFactory";
+import { ConfigurationLoader } from "../config";
 const http = require('http');
 
 
@@ -21,71 +22,73 @@ class ManagerPuntosDeVista {
     }
     
     private static obs : Observable<Evento>;
-    public static setObservable(observable : Observable<Evento>, eventEmiter : Subject<Evento>) {
+    public static setObservable(observable : Observable<Evento>) {
         if(ManagerPuntosDeVista.obs) throw "No puede sobreescribirse el objeto observable actual";
         ManagerPuntosDeVista.obs = observable;
-        this.instance = new ManagerPuntosDeVista(eventEmiter);
+        this.instance = new ManagerPuntosDeVista();
     }
 
     private viewpoint_data : Array<PuntoDeVista>;
-    private eventEmiter : Subject<Evento>;
 
 
-    private constructor(eventEmiter : Subject<Evento>) {
+    private constructor() {
         this.viewpoint_data = new Array<PuntoDeVista>();
-        this.eventEmiter = eventEmiter;
 
-        eventEmiter.asObservable().subscribe({
-            next(event) {
-                console.log("Evento recibido: "+event.toString());
-            },
-            error(err) {
-                console.error('something wrong occurred: ' + err);
-            },
-            complete() {
-                console.log('done');
-            }
-        }
-        );
+        
 
         //Aqui se añaden manualmente todos los puntos de vista
         //Estos ptos. de vista siempre existirán, independientemente del concurso
 
         //AL MENOS TIENE QUE EXISTIR UN PUNTO DE VISTA QUE UTILICE OBS, SI NO EL PROGRAMA TERMINA INMEDIATAMENTE
         //Comentar/descomentar esta linea dependiendo de si hay más puntos de vista asignados debajo
-        /* this.viewpoint_data.push( new PuntoDeVistaDummy(ManagerPuntosDeVista.obs) );
-        //this.viewpoint_data.push( new PuntoDeVistaProblema(ManagerPuntosDeVista.obs, "script_hello_judge") );
-
-        //TODO: quitar los puntos hardcodeados de quí descomentar la creacción en la factoría eventos
-        //Puntos de vista hardcodeados con el propósito de testear, hasta que se arregle lo de la información que sale del feed
-        this.viewpoint_data.push( new PuntoDeVistaProblema(ManagerPuntosDeVista.obs, "script_hello_judge") );
-        this.viewpoint_data.push( new PuntoDeVistaProblema(ManagerPuntosDeVista.obs, "ext-p-1") );
-        this.viewpoint_data.push( new PuntoDeVistaProblema(ManagerPuntosDeVista.obs, "ext-prob-2") );
-        
-        this.viewpoint_data.push( new PuntoDeVistaTiempo(ManagerPuntosDeVista.obs) ); */
+        this.viewpoint_data.push( new PuntoDeVistaDummy(ManagerPuntosDeVista.obs) );
     }
 
-    public static configurateInitialViewpoints() {
+    public static emitCreationEvents( eventEmiter : Subject<Evento> ) {
 
-        let emitChunch = (chunk : any) => {
-            let obj = JSON.parse(chunk);
-            var ev = EventFactory.obtenerEventoDesdeJSON(obj);
+        let conf = ConfigurationLoader.load();
+        let emitChunch = (chunk : any, type: String) => {
+            let event = {
+                "id": -1,
+                "op": "create",
+                "type": type,
+                "data": chunk
+            }
+            var ev = EventFactory.obtenerEventoDesdeJSON(event);
             if(ev!=null) {
-                this.instance.eventEmiter.next(ev);
+                eventEmiter.next(ev);
                 var evs = EventFactory.ProcesarYEnriquecerEvento(ev);
-                for(var _ev of evs) this.instance.eventEmiter.next(_ev);
+                for(var _ev of evs) eventEmiter.next(_ev);
             }
         }
 
         //get problems viewpoints
-        http.get("http://localhost:8080/api/problemas/", (resp: IncomingMessage) => {
-            resp.on("data", (chunk) => emitChunch(chunk));
+        let options = {
+            hostname: conf.url,
+            port: conf.port,
+            path: '/api/'+conf.api_version+'/contests/'+conf.contest_id+'/problems',
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            auth: conf.api_user+':'+conf.api_password
+        }
+
+        http.get(options, (resp: IncomingMessage) => {
+            resp.on("data", (chunk) => {
+                let problems = JSON.parse(chunk);
+                for(let problem of problems) emitChunch(problem, "problems");
+            });
         })
 
+        options.path = '/api/'+conf.api_version+'/contests/'+conf.contest_id+'/teams';
         //get teams viewpoints
-        http.get("http://localhost:8080/api/equipos/", (resp: IncomingMessage) => {
-            resp.on("data", (chunk) => emitChunch(chunk));
-        });
+        http.get(options, (resp: IncomingMessage) => {
+            resp.on("data", (chunk) =>{
+                let teams = JSON.parse(chunk);
+                for(let team of teams) emitChunch(team, "teams");
+            });
+        })
     }
 
     public static getviewpoint_data() : Array<PuntoDeVista> {
@@ -96,14 +99,14 @@ class ManagerPuntosDeVista {
         ManagerPuntosDeVista.getInstance().viewpoint_data.push(
             new PuntoDeVistaProblema(ManagerPuntosDeVista.obs, id_problema)
         );
-        console.log("Registrado punto de vista de problema con id "+id_problema);
+        //console.log("Registrado punto de vista de problema con id "+id_problema);
     }
 
     public static registrarPuntoDeVistaEquipo(id_equipo: string) {
         ManagerPuntosDeVista.getInstance().viewpoint_data.push(
             new PuntoDeVistaProblema(ManagerPuntosDeVista.obs, id_equipo)
         );
-        console.log("Registrado punto de vista de equipo con id "+id_equipo);
+        //console.log("Registrado punto de vista de equipo con id "+id_equipo);
     }
 
 
