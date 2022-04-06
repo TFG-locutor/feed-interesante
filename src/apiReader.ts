@@ -40,7 +40,8 @@ class APIReader {
             const options = {
                 hostname: this.hostname,
                 port: this.port,
-                path: '/api/'+this.api_version+'/contests/'+this.contest_id+'/event-feed',
+                //path: '/api/'+this.api_version+'/contests/'+this.contest_id+'/event-feed',
+                path: '/api/contests/'+this.contest_id+'/event-feed',
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'

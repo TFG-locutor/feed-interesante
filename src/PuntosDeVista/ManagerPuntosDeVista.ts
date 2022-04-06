@@ -72,7 +72,8 @@ class ManagerPuntosDeVista {
         let options = {
             hostname: conf.url,
             port: conf.port,
-            path: '/api/'+conf.api_version+'/contests/'+conf.contest_id+'/problems',
+            //path: '/api/'+conf.api_version+'/contests/'+conf.contest_id+'/problems',
+            path: '/api/contests/'+conf.contest_id+'/problems',
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -87,7 +88,8 @@ class ManagerPuntosDeVista {
             });
         });
 
-        options.path = '/api/'+conf.api_version+'/contests/'+conf.contest_id+'/teams';
+        //options.path = '/api/'+conf.api_version+'/contests/'+conf.contest_id+'/teams';
+        options.path = '/api/contests/'+conf.contest_id+'/teams';
         //get teams viewpoints
         http.get(options, (resp: IncomingMessage) => {
             resp.on("data", (chunk) =>{
@@ -97,7 +99,9 @@ class ManagerPuntosDeVista {
         });
 
         
-        options.path = '/api/'+conf.api_version+'/contests/'+conf.contest_id+'/groups';
+        //options.path = '/api/'+conf.api_version+'/contests/'+conf.contest_id+'/groups';
+        options.path = '/api/contests/'+conf.contest_id+'/groups';
+
         //get groups viewpoints
         http.get(options, (resp: IncomingMessage) => {
             resp.on("data", (chunk) =>{
