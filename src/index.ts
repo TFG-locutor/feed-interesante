@@ -10,6 +10,7 @@ import { PuntoDeVista } from "./PuntosDeVista/PuntoDeVista";
 import { EventHandler } from "./SalidaEventos/EventHandler";
 import { EmitOnConsole } from "./SalidaEventos/EmitOnConsole";
 import { EventoBump } from "./Eventos/Custom/EventoBump";
+import { SaveOnLog } from "./SalidaEventos/SaveOnLog";
 
 console.log("Iniciando Programa...");
 
@@ -30,6 +31,11 @@ try{
         let evHandler : EventHandler = new EmitOnConsole();
         ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
             evHandler.observeNewEventFeed(pv.getEventEmiter());
+        });
+
+        let logEvHandler : EventHandler = new SaveOnLog();
+        ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
+            logEvHandler.observeNewEventFeed(pv.getEventEmiter());
         });
     }
 
