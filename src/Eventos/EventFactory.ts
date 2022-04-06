@@ -270,6 +270,8 @@ class EventFactory {
                 break;
             case "submission":
                 if(ev.op=="create") {
+
+                    
                     var evSub = ev as SubmissionEvent;
                     var eq = evSub.team_id;
 
@@ -289,6 +291,7 @@ class EventFactory {
 
                     //Se añade el envío a la lista de envios pendientes de procesar
                     this._pending_submissions.set(evSub.id, {equipo: evSub.team_id, problema: evSub.problem_id});
+                    if (this._equipos.has(evSub.team_id))
                     eventos.push( new EventoEnvio(
                         evSub.moment.format(),
                         evSub.id,
@@ -305,6 +308,7 @@ class EventFactory {
                 break;
             case "judgement":
                 if(ev.op=="create" || ev.op=="update") {
+
                     var evJud = ev as JudgementEvent;
                     
                     //Si no contiene información del veredicto, se ignora, porque se sabe que en el futuro se va a recibir una actualización
@@ -338,8 +342,8 @@ class EventFactory {
                     }
                     
                     var entry_equipo = this._equipos.get(subData.equipo);
-                    if(entry_equipo==undefined) throw "Error interno, no existe la entrada '"+subData.equipo+"' en el mapa de equipos"
-
+                    if(entry_equipo==undefined) //throw "Error interno, no existe la entrada '"+subData.equipo+"' en el mapa de equipos"
+                        break;
 
                     eventos.push( new EventoVeredicto(
                         evJud.moment.format(),

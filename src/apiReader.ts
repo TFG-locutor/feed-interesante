@@ -43,9 +43,6 @@ class APIReader {
                 //path: '/api/'+this.api_version+'/contests/'+this.contest_id+'/event-feed',
                 path: '/api/contests/'+this.contest_id+'/event-feed',
                 method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
                 auth: this.authuser+':'+this.authpasswd,
                 qs: {
                     strict: false,
@@ -59,10 +56,10 @@ class APIReader {
                 if (statusCode !== 200) {
                     eventEmiter.error( new Error('Request Failed.\n' +
                         `Status Code: ${statusCode}`));
-                } else if (!/^application\/x-ndjson/.test(contentType)) {
+                } /* else if (!/^application\/x-ndjson/.test(contentType)) {
                     eventEmiter.error(new Error('Invalid content-type.\n' +
                         `Expected application/x-ndjson but received ${contentType}`));
-                }
+                } */
                 res.setEncoding('utf8');
                 let rawData : string = '';
                 let indexData : number = 0; //El siguiente dato (carácter) a procesar

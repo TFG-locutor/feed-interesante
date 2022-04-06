@@ -27,7 +27,7 @@ abstract class Evento{
                     default: throw "Tipo '' no reconocido para construir un campo";
                 }
             } else if(arr.length==1) {
-                prop_value = json[prop];
+                prop_value = json[prop]==undefined?null:json[prop];
             } else throw "Indicaciones no válidas para construir un campo: "+prop;
             
             this[prop_name] = prop_value;

@@ -97,22 +97,26 @@ class ManagerPuntosDeVista {
             hostname: conf.url,
             port: conf.port,
             path: '',
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            auth: conf.api_user+':'+conf.api_password
+            method: 'GET'
         }
 
         for(let tipo_entidad of tipos_entidad) {
-            options.path = '/api/'+conf.api_version+'/contests/'+conf.contest_id+'/'+tipo_entidad+"?public=true";
-            http.get(options, (resp: IncomingMessage) => {
+            options.path = '/api/contests/'+conf.contest_id+'/'+tipo_entidad;
+            let req = http.request(options, (resp: IncomingMessage) => {
+                console.log(resp.statusCode);
                 resp.on("data", (chunk) => {
                     let ents = JSON.parse(chunk);
                     for(let ent of ents) emitChunch(ent, tipo_entidad);
                     convergenciaCallBacks(tipo_entidad, ents.length);
                 });
+
+                resp.on("error", (err) => {
+                    console.log(err);
+                });
+                
             });
+
+            req.end();
         }
     }
 
