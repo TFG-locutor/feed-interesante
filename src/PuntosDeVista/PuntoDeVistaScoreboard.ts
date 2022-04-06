@@ -96,7 +96,7 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
                 //TODO: refactorizar esto
 
                 if(pastRanking!=tData.ranking_pos) {
-                    this.emitir("El equipo "+evVer.equipo+" ("+evVer.id_equipo+") ha pasado de la posición "+pastRanking+" a la posición "+tData.ranking_pos+" después de recibir un "+evVer.resultado+" en el problema "+evVer.problema+" ("+evVer.id_problema+")");
+                    this.emitir(evVer.moment.format()+": El equipo "+evVer.equipo+" ("+evVer.id_equipo+") ha pasado de la posición "+pastRanking+" a la posición "+tData.ranking_pos+" después de recibir un "+evVer.resultado+" en el problema "+evVer.problema+" ("+evVer.id_problema+")");
                 }
                 //console.log(this.teams);
 

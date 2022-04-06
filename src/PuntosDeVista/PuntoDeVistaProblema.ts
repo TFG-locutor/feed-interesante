@@ -36,16 +36,15 @@ class PuntoDeVistaProblema extends PuntoDeVista{
         switch(evento.tipo) {
             case "envio":
                 var evEnv = evento as EventoEnvio;
-                this.emitir("Envio con id "+evEnv.id_envio+" al problema '"+evEnv.problema+"' ("+evEnv.id_problema+") del equipo '"+evEnv.equipo+"' ("+evEnv.id_equipo+")");
+                this.emitir(evEnv.moment.format()+": Envio con id "+evEnv.id_envio+" al problema '"+evEnv.problema+"' ("+evEnv.id_problema+") del equipo '"+evEnv.equipo+"' ("+evEnv.id_equipo+")");
                 break;
             case "veredicto":
                 var evVer = evento as EventoVeredicto;
-                this.emitir("El resultado del envío "+evVer.id_envio+" ha sido "+evVer.resultado+ ", lleva "+evVer.n_intento+" intentos" );
+                this.emitir(evVer.moment.format()+": El resultado del envío "+evVer.id_envio+" ha sido "+evVer.resultado+ ", lleva "+evVer.n_intento+" intentos" );
                 if(evVer.resultado=="AC"){
                     if(!this._ha_sido_resuelto) {
                         this._ha_sido_resuelto = true;
-                        this.emitir("El equipo '"+evVer.equipo+"' ("+evVer.id_equipo+") ha sido el primero en resolver el problema '"+evVer.problema+"' ("+this.id_problema+") - ["+evVer.n_intento+" intento/s]");
-                        console.log("Por cierto en total hay "+this._nEquipos+" equipos");
+                        this.emitir(evVer.moment.format()+": El equipo '"+evVer.equipo+"' ("+evVer.id_equipo+") ha sido el primero en resolver el problema '"+evVer.problema+"' ("+this.id_problema+") - ["+evVer.n_intento+" intento/s]");
                     }
                 }
                 break;

@@ -36,23 +36,23 @@ class PuntoDeVistaTiempo extends PuntoDeVista {
                 switch(evCE.cambio) {
                     case CambioEstado.MarcadorCongelado:
                         if(forward) {
-                            this.emitir("Se ha congelado el marcador");
+                            this.emitir(evCE.moment.format()+": Se ha congelado el marcador");
                         } else {
-                            this.emitir("Se ha descongelado el marcador");
+                            this.emitir(evCE.moment.format()+": Se ha descongelado el marcador");
                         }
                         break;
                     case CambioEstado.ConcursoIniciado:
                         if(forward) {
-                            this.emitir("Ha empezado el concurso");
+                            this.emitir(evCE.moment.format()+": Ha empezado el concurso");
                         } else {
-                            this.emitir("El concurso aún no ha empezado");
+                            this.emitir(evCE.moment.format()+": El concurso aún no ha empezado");
                         }
                         break;
                     case CambioEstado.ConcursoFinalizado:
                         if(forward) {
-                            this.emitir("Ha terminado el concurso");
+                            this.emitir(evCE.moment.format()+": Ha terminado el concurso");
                         } else {
-                            this.emitir("El concurso aún no ha terminado");
+                            this.emitir(evCE.moment.format()+": El concurso aún no ha terminado");
                         }
                         break;
                 }
