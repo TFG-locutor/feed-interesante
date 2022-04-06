@@ -281,9 +281,7 @@ class APIReader {
                     if(insideComillas) continue;
                     if(ch=='{') ++numParentesis;
                     if(ch=='}') --numParentesis;
-                    //let specialCharacter:string = "\\";
                     
-                    if(anteriorIgualAEscape) console.log("anterioresxcape")
                     if(numParentesis==0) {
                         
                         let dataSTR = rawData.substring(0,indexData+1);

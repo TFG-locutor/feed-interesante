@@ -8,6 +8,7 @@ import { EventFactory } from "../Eventos/EventFactory";
 import { ConfigurationLoader } from "../config";
 import { PuntoDeVistaScoreboard } from "./PuntoDeVistaScoreboard";
 import { PuntoDeVistaEquipo } from "./PuntoDeVistaEquipo";
+import { PuntoDeVistaGrupo } from "./PuntoDeVistaGrupo";
 const http = require('http');
 
 
@@ -84,7 +85,7 @@ class ManagerPuntosDeVista {
                 let problems = JSON.parse(chunk);
                 for(let problem of problems) emitChunch(problem, "problems");
             });
-        })
+        });
 
         options.path = '/api/'+conf.api_version+'/contests/'+conf.contest_id+'/teams';
         //get teams viewpoints
@@ -93,7 +94,17 @@ class ManagerPuntosDeVista {
                 let teams = JSON.parse(chunk);
                 for(let team of teams) emitChunch(team, "teams");
             });
-        })
+        });
+
+        
+        options.path = '/api/'+conf.api_version+'/contests/'+conf.contest_id+'/groups';
+        //get groups viewpoints
+        http.get(options, (resp: IncomingMessage) => {
+            resp.on("data", (chunk) =>{
+                let groups = JSON.parse(chunk);
+                for(let group of groups) emitChunch(group, "groups");
+            });
+        });
     }
 
     public static getviewpoint_data() : Array<PuntoDeVista> {
@@ -112,6 +123,12 @@ class ManagerPuntosDeVista {
             new PuntoDeVistaEquipo(ManagerPuntosDeVista.obs, id_equipo)
         );
         //console.log("Registrado punto de vista de equipo con id "+id_equipo);
+    }
+
+    static registrarPuntoDeVistaGrupo(id_grupo: string, nombre_grupo: string) {
+        ManagerPuntosDeVista.getInstance().viewpoint_data.push(
+            new PuntoDeVistaGrupo(ManagerPuntosDeVista.obs, id_grupo, nombre_grupo)
+        );
     }
 
 

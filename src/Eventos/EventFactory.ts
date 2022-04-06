@@ -15,25 +15,8 @@ import { LanguageEvent } from "./LanguageEvent";
 import { ManagerPuntosDeVista } from "../PuntosDeVista/ManagerPuntosDeVista";
 import { CambioEstado, EventoCambioEstado, TipoCambioEstado } from "./Custom/EventoCambioEstado";
 import moment from "moment";
+import { TEquipoData, TGrupoData, TJudTypeData, TProblemData, TSubData } from "../InternalDataTypes";
 
-type TSubData = {
-    equipo:string;
-    problema:string;
-};
-
-type TJudTypeData = {
-    nombre: string;
-    penaliza: boolean;
-    resuelto: boolean;
-};
-
-type TProblemData = {
-    nombre: string;
-};
-
-type TEquipoData = {
-    nombre: string;
-};
 
 //singleton
 class EventFactory {
@@ -67,6 +50,13 @@ class EventFactory {
         return equipo.nombre;
     }
 
+    _grupos: Map<string,TGrupoData>;
+    private getGroupName(id: string) : string {
+        var grupo = this._grupos.get(id);
+        if(grupo==undefined ||grupo.nombre==undefined) return "unknown group name";
+        return grupo.nombre;
+    }
+
     //Marcadores para los cambios de estado del concurso
     
     sb_freeze_duration : string | null;
@@ -83,6 +73,7 @@ class EventFactory {
         this._judgement_types = new Map<string,TJudTypeData>();
         this._problemas = new Map<string,TProblemData>();
         this._equipos = new Map<string,TEquipoData>();
+        this._grupos = new Map<string,TGrupoData>();
 
         this.sb_freeze_duration = null;
         this.contest_start = null;
@@ -263,7 +254,16 @@ class EventFactory {
                         //El problema es nuevo, hay que crear un punto de vista
                         ManagerPuntosDeVista.registrarPuntoDeVistaEquipo(evTea.id);
                     }
-                    this._equipos.set(evTea.id, {nombre: evTea.display_name});
+                    this._equipos.set(evTea.id, {nombre: evTea.display_name, grupos: evTea.group_ids});
+                }
+                break;
+            case "group":
+                let evGro = ev as GroupEvent;
+                if((evGro.op=="create" && !this._grupos.has(evGro.id)) ||evGro.op=="update") {
+                    if(this._grupos.get(evGro.id)==undefined) {
+                        ManagerPuntosDeVista.registrarPuntoDeVistaGrupo(evGro.id, evGro.name);
+                    }
+                    this._grupos.set(evGro.id, {id: evGro.id, nombre: evGro.name, oculto: evGro.hidden});
                 }
                 break;
             case "submission":
@@ -335,10 +335,15 @@ class EventFactory {
                         entry_intentos_por_equipo.set(subData.problema,entry_intentos_por_equipo_problema=-entry_intentos_por_equipo_problema);
                     }
                     
+                    var entry_equipo = this._equipos.get(subData.equipo);
+                    if(entry_equipo==undefined) throw "Error interno, no existe la entrada '"+subData.equipo+"' en el mapa de equipos"
+
+
                     eventos.push( new EventoVeredicto(
                         evJud.moment.format(),
                         evJud.submission_id,
                         subData.equipo, this.getTeamName(subData.equipo),
+                        entry_equipo.grupos,
                         subData.problema, this.getProblemName(subData.problema),
                         evJud.judgement_type_id,
                         entry_judgement_type.resuelto,
