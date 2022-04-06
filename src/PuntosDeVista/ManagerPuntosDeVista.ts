@@ -6,6 +6,8 @@ import { PuntoDeVistaTiempo } from "./PuntoDeVistaTiempo";
 import { IncomingMessage } from "http";
 import { EventFactory } from "../Eventos/EventFactory";
 import { ConfigurationLoader } from "../config";
+import { PuntoDeVistaScoreboard } from "./PuntoDeVistaScoreboard";
+import { PuntoDeVistaEquipo } from "./PuntoDeVistaEquipo";
 const http = require('http');
 
 
@@ -42,6 +44,9 @@ class ManagerPuntosDeVista {
         //AL MENOS TIENE QUE EXISTIR UN PUNTO DE VISTA QUE UTILICE OBS, SI NO EL PROGRAMA TERMINA INMEDIATAMENTE
         //Comentar/descomentar esta linea dependiendo de si hay más puntos de vista asignados debajo
         this.viewpoint_data.push( new PuntoDeVistaDummy(ManagerPuntosDeVista.obs) );
+
+        this.viewpoint_data.push( new PuntoDeVistaScoreboard(ManagerPuntosDeVista.obs) );
+        this.viewpoint_data.push( new PuntoDeVistaTiempo(ManagerPuntosDeVista.obs) );
     }
 
     public static emitCreationEvents( eventEmiter : Subject<Evento> ) {
@@ -104,7 +109,7 @@ class ManagerPuntosDeVista {
 
     public static registrarPuntoDeVistaEquipo(id_equipo: string) {
         ManagerPuntosDeVista.getInstance().viewpoint_data.push(
-            new PuntoDeVistaProblema(ManagerPuntosDeVista.obs, id_equipo)
+            new PuntoDeVistaEquipo(ManagerPuntosDeVista.obs, id_equipo)
         );
         //console.log("Registrado punto de vista de equipo con id "+id_equipo);
     }

@@ -10,7 +10,7 @@ import { TeamEvent } from "./TeamEvent";
 import { SubmissionEvent } from "./SubmissionEvent";
 import { EventoVeredicto } from "./Custom/EventoVeredicto";
 import { EventoEnvio } from "./Custom/EventoEnvio";
-import { ContestEvent } from "./ContestsEvent";
+import { ContestEvent } from "./ContestEvent";
 import { LanguageEvent } from "./LanguageEvent";
 import { ManagerPuntosDeVista } from "../PuntosDeVista/ManagerPuntosDeVista";
 import { CambioEstado, EventoCambioEstado, TipoCambioEstado } from "./Custom/EventoCambioEstado";
@@ -341,6 +341,8 @@ class EventFactory {
                         subData.equipo, this.getTeamName(subData.equipo),
                         subData.problema, this.getProblemName(subData.problema),
                         evJud.judgement_type_id,
+                        entry_judgement_type.resuelto,
+                        entry_judgement_type.penaliza,
                         Math.abs(entry_intentos_por_equipo_problema)
                     ) );
                 }

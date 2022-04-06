@@ -6,6 +6,7 @@
     },
     "scripts": {
         "start": "npx tsc && node build/index.js",
+        "startdb": "npx tsc && node --trace-uncaught build/index.js",
         "build": "npx tsc"
     },
     "dependencies": {

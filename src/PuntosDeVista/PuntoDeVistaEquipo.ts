@@ -4,7 +4,7 @@ import { EventoEnvio } from "../Eventos/Custom/EventoEnvio";
 import { Evento } from "../Eventos/Evento";
 import { PuntoDeVista } from "./PuntoDeVista";
 
-class PuntoDeVistaDummy extends PuntoDeVista{
+class PuntoDeVistaEquipo extends PuntoDeVista{
     
     id_equipo: string;
 
@@ -19,10 +19,10 @@ class PuntoDeVistaDummy extends PuntoDeVista{
     }
 
     actualizar(evento: Evento): void {
-        console.log("Evento de equipo:");
-        console.log(evento)
+        //console.log("Evento de equipo:");
+        //console.log(evento)
     }
 };
 
-export{PuntoDeVistaDummy};
+export{PuntoDeVistaEquipo};
 

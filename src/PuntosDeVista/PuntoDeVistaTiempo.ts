@@ -1,6 +1,6 @@
 import moment, { now } from "moment";
 import { Observable } from "rxjs";
-import { ContestEvent } from "../Eventos/ContestsEvent";
+import { ContestEvent } from "../Eventos/ContestEvent";
 import { CambioEstado, EventoCambioEstado, TipoCambioEstado } from "../Eventos/Custom/EventoCambioEstado";
 import { Evento } from "../Eventos/Evento";
 import { PuntoDeVista } from "./PuntoDeVista";
@@ -35,23 +35,23 @@ class PuntoDeVistaTiempo extends PuntoDeVista {
                 switch(evCE.cambio) {
                     case CambioEstado.MarcadorCongelado:
                         if(forward) {
-                            console.log("Se ha congelado el marcador");
+                            this.emitir("Se ha congelado el marcador");
                         } else {
-                            console.log("Se ha descongelado el marcador");
+                            this.emitir("Se ha descongelado el marcador");
                         }
                         break;
                     case CambioEstado.ConcursoIniciado:
                         if(forward) {
-                            console.log("Ha empezado el concurso");
+                            this.emitir("Ha empezado el concurso");
                         } else {
-                            console.log("El concurso aún no ha empezado");
+                            this.emitir("El concurso aún no ha empezado");
                         }
                         break;
                     case CambioEstado.ConcursoFinalizado:
                         if(forward) {
-                            console.log("Ha terminado el concurso");
+                            this.emitir("Ha terminado el concurso");
                         } else {
-                            console.log("El concurso aún no ha terminado");
+                            this.emitir("El concurso aún no ha terminado");
                         }
                         break;
                 }
