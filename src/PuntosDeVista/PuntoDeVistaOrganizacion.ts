@@ -13,8 +13,11 @@ type TTeamSBData = {
     problem_penal: Map<string,number>;
 };
 
-class PuntoDeVistaScoreboard extends PuntoDeVista{
+class PuntoDeVistaOrganizacion extends PuntoDeVista{
     
+    id_organizacion : string;
+    nombre_organizacion : string;
+
     //registro del tiempo de penalización
     penalty_time : number;
     start_moment : moment.Moment;
@@ -23,17 +26,19 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
     private teams : Array<string>;
     private team_data : Map<string,TTeamSBData>;
 
-    constructor( eventFeed : Observable<Evento> ) {
+    constructor( eventFeed : Observable<Evento>, id_organizacion : string, nombre_organizacion : string ) {
         super( eventFeed );
+        this.id_organizacion = id_organizacion;
+        this.nombre_organizacion = nombre_organizacion;
         this.teams = new Array<string>();
         this.team_data = new Map<string,TTeamSBData>();
         this.penalty_time = 0;
         this.start_moment = moment();
-        console.log("creado el punto de vista del scoreboard")
+        console.log("creado punto de vista de la organizacion "+nombre_organizacion+" ("+id_organizacion+")")
     }
 
     filtrar(evento: Evento): boolean {
-        if(evento.tipo=="veredicto") return true;
+        if(evento.tipo=="veredicto" && evento.id_organizacion == this.id_organizacion) return true;
         if(evento.tipo=="contest" && (evento.op=="create"||evento.op=="update")) return true;
         return false;
     }
@@ -96,9 +101,8 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
                 //TODO: refactorizar esto
 
                 if(pastRanking!=tData.ranking_pos) {
-                    this.emitir("El equipo "+evVer.equipo+" ("+evVer.id_equipo+") ha pasado de la posición "+pastRanking+" a la posición "+tData.ranking_pos+" después de recibir un "+evVer.resultado+" en el problema "+evVer.problema+" ("+evVer.id_problema+")");
+                    this.emitir("El equipo "+evVer.equipo+" ("+evVer.id_equipo+") ha pasado de la posición "+pastRanking+" a la posición "+tData.ranking_pos+" dentro de la organización "+this.nombre_organizacion+" ("+this.id_organizacion+")"+" después de recibir un "+evVer.resultado+" en el problema "+evVer.problema+" ("+evVer.id_problema+")");
                 }
-                //console.log(this.teams);
 
                 break;
             case "contest":
@@ -107,9 +111,8 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
                 this.start_moment = evCon.start_time;
                 break;
         }
-        //console.log(evento)
     }
 };
 
-export{PuntoDeVistaScoreboard};
+export{PuntoDeVistaOrganizacion};
 

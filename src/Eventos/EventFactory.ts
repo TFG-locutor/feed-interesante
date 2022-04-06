@@ -239,27 +239,29 @@ class EventFactory {
                 break;
             case "problem":
                 let evPro = ev as ProblemEvent;
-                //console.log(evPro);
-                if((evPro.op=="create" && !this._problemas.has(evPro.id))||evPro.op=="update") {
-                    if(evPro.op=="create") {
-                        ManagerPuntosDeVista.registrarPuntoDeVistaProblema(evPro.id);
+                if(evPro.op=="manual_create") {
+                //if((evPro.op=="create" && !this._problemas.has(evPro.id))||evPro.op=="update") {
+                    if(this._problemas.get(evPro.id)==undefined) {
+                        ManagerPuntosDeVista.registrarPuntoDeVistaProblema(evPro.id, evPro.name);
                     }
                     this._problemas.set(evPro.id, { nombre: evPro.name });
                 }
                 break;
             case "team":
                 let evTea = ev as TeamEvent; 
-                if((evTea.op=="create" && !this._equipos.has(evTea.id))||evTea.op=="update") {
+                if(evTea.op=="manual_create") {
+                //if((evTea.op=="create" && !this._equipos.has(evTea.id))||evTea.op=="update") {
                     if(this._equipos.get(evTea.id)==undefined) {//if(evTea.op=="create") {
                         //El problema es nuevo, hay que crear un punto de vista
-                        ManagerPuntosDeVista.registrarPuntoDeVistaEquipo(evTea.id);
+                        ManagerPuntosDeVista.registrarPuntoDeVistaEquipo(evTea.id, evTea.name);
                     }
-                    this._equipos.set(evTea.id, {nombre: evTea.display_name, grupos: evTea.group_ids});
+                    this._equipos.set(evTea.id, {nombre: evTea.display_name, organizacion: evTea.organization_id, grupos: evTea.group_ids});
                 }
                 break;
             case "group":
                 let evGro = ev as GroupEvent;
-                if((evGro.op=="create" && !this._grupos.has(evGro.id)) ||evGro.op=="update") {
+                if(evGro.op=="manual_create") {
+                //if((evGro.op=="create" && !this._grupos.has(evGro.id)) ||evGro.op=="update") {
                     if(this._grupos.get(evGro.id)==undefined) {
                         ManagerPuntosDeVista.registrarPuntoDeVistaGrupo(evGro.id, evGro.name);
                     }
@@ -343,6 +345,7 @@ class EventFactory {
                         evJud.moment.format(),
                         evJud.submission_id,
                         subData.equipo, this.getTeamName(subData.equipo),
+                        entry_equipo.organizacion,
                         entry_equipo.grupos,
                         subData.problema, this.getProblemName(subData.problema),
                         evJud.judgement_type_id,

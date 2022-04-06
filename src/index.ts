@@ -9,6 +9,7 @@ import { Evento } from "./Eventos/Evento";
 import { PuntoDeVista } from "./PuntosDeVista/PuntoDeVista";
 import { EventHandler } from "./SalidaEventos/EventHandler";
 import { EmitOnConsole } from "./SalidaEventos/EmitOnConsole";
+import { EventoBump } from "./Eventos/Custom/EventoBump";
 
 console.log("Iniciando Programa...");
 
@@ -21,9 +22,22 @@ try{
     let eventEmiter : Subject<Evento> = new Subject<Evento>();
     let apiReader = new APIReader(conf.url, conf.port, conf.contest_id, conf.api_version, conf.api_user, conf.api_password);
     
-    
+    eventEmiter
+    const cbIniciar = () => {
+        console.log("Se han terminado las llamadas a la API");
+        apiReader.suscribe_feed(eventEmiter);
+
+        let evHandler : EventHandler = new EmitOnConsole();
+        ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
+            evHandler.observeNewEventFeed(pv.getEventEmiter());
+        });
+    }
+
     ManagerPuntosDeVista.setObservable(eventEmiter.asObservable());
-    ManagerPuntosDeVista.emitCreationEvents(eventEmiter);
+    console.log("Obteniendo información del concurso mediante llamadas a sus endpoints");
+    ManagerPuntosDeVista.emitCreationEvents(eventEmiter, cbIniciar);
+
+    
 
     /* var obs = eventEmiter.asObservable().pipe(
         share(), //una misma ejecucion de la request
@@ -34,15 +48,8 @@ try{
         filter(e=> e!==null),
     ); */
 
-    //var p1 = new PuntoDeVistaProblema(obs,"script_hello_judge")
 
-    apiReader.suscribe_feed(eventEmiter);
-
-
-    let evHandler : EventHandler = new EmitOnConsole();
-    ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
-        evHandler.observeNewEventFeed(pv.getEventEmiter());
-    });
+    
 
 } catch (err) {
     console.log("ERROR: "+err)

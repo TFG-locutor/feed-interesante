@@ -19,6 +19,7 @@ class PuntoDeVistaTiempo extends PuntoDeVista {
         this.contest_end = null;
         this.freezeTime = null;
         this.marcadorCongeladoComunicado = false;
+        console.log("creado el punto de vista del tiempo")
     }
 
     filtrar(evento: Evento): boolean {

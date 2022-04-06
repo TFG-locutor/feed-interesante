@@ -9,6 +9,9 @@ import { ConfigurationLoader } from "../config";
 import { PuntoDeVistaScoreboard } from "./PuntoDeVistaScoreboard";
 import { PuntoDeVistaEquipo } from "./PuntoDeVistaEquipo";
 import { PuntoDeVistaGrupo } from "./PuntoDeVistaGrupo";
+import { EventoConfiguracion } from "../Eventos/Custom/EventoConfiguracion";
+import moment from "moment";
+import { PuntoDeVistaOrganizacion } from "./PuntoDeVistaOrganizacion";
 const http = require('http');
 
 
@@ -50,13 +53,13 @@ class ManagerPuntosDeVista {
         this.viewpoint_data.push( new PuntoDeVistaTiempo(ManagerPuntosDeVista.obs) );
     }
 
-    public static emitCreationEvents( eventEmiter : Subject<Evento> ) {
+    public static emitCreationEvents( eventEmiter : Subject<Evento>, callback: ()=>void) {
 
         let conf = ConfigurationLoader.load();
         let emitChunch = (chunk : any, type: String) => {
             let event = {
                 "id": -1,
-                "op": "create",
+                "op": "manual_create",
                 "type": type,
                 "data": chunk
             }
@@ -68,11 +71,33 @@ class ManagerPuntosDeVista {
             }
         }
 
+        const tipos_entidad = ["problems","teams","groups","organizations"];
+
+        let cuentaCallbacks = 0;
+        let evConf = new EventoConfiguracion("");
+        let convergenciaCallBacks = (tipo: string, tam: number) => {
+            ++cuentaCallbacks;
+            switch(tipo) {
+                case "problems": evConf.nProblemas = tam; break;
+                case "teams": evConf.nEquipos = tam; break;
+                case "groups": evConf.nGrupos = tam; break;
+                case "organizations": evConf.nOrganizaciones = tam; break;
+                default: throw "Error interno, no se reconoce el tipo '"+tipo+"'"
+            }
+            //Se han recibido todos los callbacks que se esperaban (1 por entidad);
+            if(cuentaCallbacks==tipos_entidad.length) {
+                eventEmiter.next(evConf);
+                var evs = EventFactory.ProcesarYEnriquecerEvento(evConf);
+                for(var _ev of evs) eventEmiter.next(_ev);
+                callback();
+            }
+        }
+
         //get problems viewpoints
         let options = {
             hostname: conf.url,
             port: conf.port,
-            path: '/api/'+conf.api_version+'/contests/'+conf.contest_id+'/problems',
+            path: '',
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -80,47 +105,33 @@ class ManagerPuntosDeVista {
             auth: conf.api_user+':'+conf.api_password
         }
 
-        http.get(options, (resp: IncomingMessage) => {
-            resp.on("data", (chunk) => {
-                let problems = JSON.parse(chunk);
-                for(let problem of problems) emitChunch(problem, "problems");
+        for(let tipo_entidad of tipos_entidad) {
+            options.path = '/api/'+conf.api_version+'/contests/'+conf.contest_id+'/'+tipo_entidad+"?public=true";
+            http.get(options, (resp: IncomingMessage) => {
+                resp.on("data", (chunk) => {
+                    let ents = JSON.parse(chunk);
+                    for(let ent of ents) emitChunch(ent, tipo_entidad);
+                    convergenciaCallBacks(tipo_entidad, ents.length);
+                });
             });
-        });
+        }
 
-        options.path = '/api/'+conf.api_version+'/contests/'+conf.contest_id+'/teams';
-        //get teams viewpoints
-        http.get(options, (resp: IncomingMessage) => {
-            resp.on("data", (chunk) =>{
-                let teams = JSON.parse(chunk);
-                for(let team of teams) emitChunch(team, "teams");
-            });
-        });
-
-        
-        options.path = '/api/'+conf.api_version+'/contests/'+conf.contest_id+'/groups';
-        //get groups viewpoints
-        http.get(options, (resp: IncomingMessage) => {
-            resp.on("data", (chunk) =>{
-                let groups = JSON.parse(chunk);
-                for(let group of groups) emitChunch(group, "groups");
-            });
-        });
     }
 
     public static getviewpoint_data() : Array<PuntoDeVista> {
         return this.instance.viewpoint_data;
     }
     
-    public static registrarPuntoDeVistaProblema(id_problema: string) {
+    public static registrarPuntoDeVistaProblema(id_problema: string, nombre_problema: string) {
         ManagerPuntosDeVista.getInstance().viewpoint_data.push(
-            new PuntoDeVistaProblema(ManagerPuntosDeVista.obs, id_problema)
+            new PuntoDeVistaProblema(ManagerPuntosDeVista.obs, id_problema, nombre_problema)
         );
         //console.log("Registrado punto de vista de problema con id "+id_problema);
     }
 
-    public static registrarPuntoDeVistaEquipo(id_equipo: string) {
+    public static registrarPuntoDeVistaEquipo(id_equipo: string, nombre_equipo: string) {
         ManagerPuntosDeVista.getInstance().viewpoint_data.push(
-            new PuntoDeVistaEquipo(ManagerPuntosDeVista.obs, id_equipo)
+            new PuntoDeVistaEquipo(ManagerPuntosDeVista.obs, id_equipo, nombre_equipo)
         );
         //console.log("Registrado punto de vista de equipo con id "+id_equipo);
     }
@@ -128,6 +139,12 @@ class ManagerPuntosDeVista {
     static registrarPuntoDeVistaGrupo(id_grupo: string, nombre_grupo: string) {
         ManagerPuntosDeVista.getInstance().viewpoint_data.push(
             new PuntoDeVistaGrupo(ManagerPuntosDeVista.obs, id_grupo, nombre_grupo)
+        );
+    }
+
+    static registrarPuntoDeVistaOrganizacion(id_organizacion: string, nombre_organizacion: string) {
+        ManagerPuntosDeVista.getInstance().viewpoint_data.push(
+            new PuntoDeVistaOrganizacion(ManagerPuntosDeVista.obs, id_organizacion, nombre_organizacion)
         );
     }
 
