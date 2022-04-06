@@ -103,7 +103,6 @@ class ManagerPuntosDeVista {
         for(let tipo_entidad of tipos_entidad) {
             options.path = '/api/contests/'+conf.contest_id+'/'+tipo_entidad;
             let req = http.request(options, (resp: IncomingMessage) => {
-                console.log(resp.statusCode);
                 resp.on("data", (chunk) => {
                     let ents = JSON.parse(chunk);
                     for(let ent of ents) emitChunch(ent, tipo_entidad);
