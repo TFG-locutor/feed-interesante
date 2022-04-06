@@ -3,13 +3,14 @@ import { EventHandler } from "./EventHandler";
 import { configure, getLogger, Log4js, Logger } from "log4js";
 
 import { writeFile } from 'fs';
+import moment from "moment";
 
 class SaveOnLog extends EventHandler{
     constructor(){
         super();
         
         configure({
-            appenders: { 'file': { type: 'file', filename: 'logs/eventFeed.log' } },
+            appenders: { 'file': { type: 'file', filename: 'logs/'+moment().format("DDMMYYYYhhmmss")+'eventFeed.log' } },
             categories: { default: { appenders: ['file'], level: 'debug' }}
           });       
         
