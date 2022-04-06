@@ -10,6 +10,8 @@ class EventoVeredicto extends Evento {
     id_equipo: string;
     equipo: string;
 
+    id_organizacion: string;
+
     grupos: Array<string>;
 
     id_problema: string;
@@ -21,7 +23,7 @@ class EventoVeredicto extends Evento {
 
     n_intento: number;
 
-    constructor(_moment: string, id_envio: string, id_equipo:string, equipo: string, grupos: Array<string>, id_problema: string, problema: string, resultado: string, solved: boolean, penalty: boolean, n_intento: number) {
+    constructor(_moment: string, id_envio: string, id_equipo:string, equipo: string, id_organizacion: string, grupos: Array<string>, id_problema: string, problema: string, resultado: string, solved: boolean, penalty: boolean, n_intento: number) {
         
         super("create","veredicto", _moment,null,[]);
 
@@ -29,6 +31,8 @@ class EventoVeredicto extends Evento {
 
         this.id_equipo = id_equipo;
         this.equipo = equipo;
+
+        this.id_organizacion = id_organizacion;
 
         this.grupos = grupos;
 

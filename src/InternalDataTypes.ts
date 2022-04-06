@@ -16,6 +16,7 @@ type TProblemData = {
 type TEquipoData = {
     nombre: string;
     grupos: [string];
+    organizacion: string;
 };
 
 type TGrupoData = {

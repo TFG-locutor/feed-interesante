@@ -22,7 +22,7 @@ abstract class Evento{
                 prop_name = arr[0];
                 switch(arr[1]) {
                     case "moment":
-                        prop_value = moment(json[prop_name]);
+                        prop_value = moment(new Date(json[prop_name]));
                         break;
                     default: throw "Tipo '' no reconocido para construir un campo";
                 }
