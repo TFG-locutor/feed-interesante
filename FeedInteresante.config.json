@@ -1,8 +1,8 @@
 {
-    "url": "192.168.100.150",
-    "port": 80,
+    "url": "localhost",
+    "port": 8080,
     "api_version": "v4",
     "contest_id": "contest",
     "api_user": "admin",
-    "api_password": "admin"
+    "api_password": "adm1n"
 }
