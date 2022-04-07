@@ -115,7 +115,7 @@ class ManagerPuntosDeVista {
                     console.log(err);
                 });
                 resp.on("end", () => {
-                    console.log(responseJson);
+                    //console.log(responseJson);
                     let ents = JSON.parse(responseJson);
                     for(let ent of ents) emitChunch(ent, tipo_entidad);
                     convergenciaCallBacks(tipo_entidad, ents.length);
