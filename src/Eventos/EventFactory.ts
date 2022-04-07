@@ -15,7 +15,7 @@ import { LanguageEvent } from "./LanguageEvent";
 import { ManagerPuntosDeVista } from "../PuntosDeVista/ManagerPuntosDeVista";
 import { CambioEstado, EventoCambioEstado, TipoCambioEstado } from "./Custom/EventoCambioEstado";
 import moment from "moment";
-import { TEquipoData, TGrupoData, TJudTypeData, TProblemData, TSubData } from "../InternalDataTypes";
+import { TEquipoData, TGrupoData, TJudTypeData, TOrganizacionData, TProblemData, TSubData } from "../InternalDataTypes";
 
 
 //singleton
@@ -57,6 +57,8 @@ class EventFactory {
         return grupo.nombre;
     }
 
+    _organizaciones: Map<string,TOrganizacionData>;
+
     //Marcadores para los cambios de estado del concurso
     
     sb_freeze_duration : string | null;
@@ -74,6 +76,7 @@ class EventFactory {
         this._problemas = new Map<string,TProblemData>();
         this._equipos = new Map<string,TEquipoData>();
         this._grupos = new Map<string,TGrupoData>();
+        this._organizaciones = new Map<string,TOrganizacionData>();
 
         this.sb_freeze_duration = null;
         this.contest_start = null;
@@ -255,7 +258,7 @@ class EventFactory {
                         //El problema es nuevo, hay que crear un punto de vista
                         ManagerPuntosDeVista.registrarPuntoDeVistaEquipo(evTea.id, evTea.name);
                     }
-                    this._equipos.set(evTea.id, {nombre: evTea.display_name, organizacion: evTea.organization_id, grupos: evTea.group_ids});
+                    this._equipos.set(evTea.id, {nombre: evTea.name, organizacion: evTea.organization_id, grupos: evTea.group_ids});
                 }
                 break;
             case "group":
@@ -268,6 +271,14 @@ class EventFactory {
                     this._grupos.set(evGro.id, {id: evGro.id, nombre: evGro.name, oculto: evGro.hidden});
                 }
                 break;
+            case "organization":
+                let evOrg = ev as OrganizationEvent;
+                if(evOrg.op=="manual_create") {
+                    if(this._organizaciones.get(evOrg.id)==undefined) {
+                        ManagerPuntosDeVista.registrarPuntoDeVistaOrganizacion(evOrg.id, evOrg.name);
+                    }
+                    this._organizaciones.set(evOrg.id, {id: evOrg.id, nombre: evOrg.name});
+                }
             case "submission":
                 if(ev.op=="create") {
 

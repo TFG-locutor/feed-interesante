@@ -43,7 +43,7 @@ class APIReader {
                 //path: '/api/'+this.api_version+'/contests/'+this.contest_id+'/event-feed',
                 path: '/api/contests/'+this.contest_id+'/event-feed',
                 method: 'GET',
-                auth: this.authuser+':'+this.authpasswd,
+                //auth: this.authuser+':'+this.authpasswd,
                 qs: {
                     strict: false,
                     stream: true

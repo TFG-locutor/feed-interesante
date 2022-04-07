@@ -25,10 +25,16 @@ type TGrupoData = {
     oculto: boolean;
 };
 
+type TOrganizacionData = {
+    id: string;
+    nombre: string;
+};
+
 export{
     TSubData,
     TJudTypeData,
     TProblemData,
     TEquipoData,
-    TGrupoData
+    TGrupoData,
+    TOrganizacionData
 }

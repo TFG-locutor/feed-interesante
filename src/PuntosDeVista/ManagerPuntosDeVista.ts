@@ -103,12 +103,15 @@ class ManagerPuntosDeVista {
         for(let tipo_entidad of tipos_entidad) {
             options.path = '/api/contests/'+conf.contest_id+'/'+tipo_entidad;
             let req = http.request(options, (resp: IncomingMessage) => {
+                let rawData : string = '';
                 resp.on("data", (chunk) => {
-                    let ents = JSON.parse(chunk);
+                    rawData += chunk;
+                });
+                resp.on("end", () => {
+                    let ents = JSON.parse(rawData);
                     for(let ent of ents) emitChunch(ent, tipo_entidad);
                     convergenciaCallBacks(tipo_entidad, ents.length);
                 });
-
                 resp.on("error", (err) => {
                     console.log(err);
                 });
