@@ -255,7 +255,7 @@ class EventFactory {
                         //El problema es nuevo, hay que crear un punto de vista
                         ManagerPuntosDeVista.registrarPuntoDeVistaEquipo(evTea.id, evTea.name);
                     }
-                    this._equipos.set(evTea.id, {nombre: evTea.display_name, organizacion: evTea.organization_id, grupos: evTea.group_ids});
+                    this._equipos.set(evTea.id, {nombre: evTea.name, organizacion: evTea.organization_id, grupos: evTea.group_ids});
                 }
                 break;
             case "group":
