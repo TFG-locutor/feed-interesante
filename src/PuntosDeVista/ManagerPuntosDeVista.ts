@@ -104,17 +104,23 @@ class ManagerPuntosDeVista {
             options.path = '/api/contests/'+conf.contest_id+'/'+tipo_entidad;
             let req = http.request(options, (resp: IncomingMessage) => {
                 console.log(resp.statusCode);
+                let responseJson = '';
                 resp.on("data", (chunk) => {
-                    let ents = JSON.parse(chunk);
+                    responseJson +=chunk
+                    /* let ents = JSON.parse(chunk);
                     for(let ent of ents) emitChunch(ent, tipo_entidad);
-                    convergenciaCallBacks(tipo_entidad, ents.length);
+                    convergenciaCallBacks(tipo_entidad, ents.length); */
                 });
-
                 resp.on("error", (err) => {
                     console.log(err);
                 });
-                
-            });
+                resp.on("end", () => {
+                    console.log(responseJson);
+                    let ents = JSON.parse(responseJson);
+                    for(let ent of ents) emitChunch(ent, tipo_entidad);
+                    convergenciaCallBacks(tipo_entidad, ents.length);
+            })
+        })
 
             req.end();
         }

@@ -1,8 +1,8 @@
 {
-    "url": "localhost",
+    "url": "cds.juezonline.com",
     "port": 8080,
     "api_version": "v4",
-    "contest_id": "contest",
+    "contest_id": "Multisede",
     "api_user": "admin",
     "api_password": "adm1n"
 }
