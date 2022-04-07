@@ -115,7 +115,6 @@ class ManagerPuntosDeVista {
                 resp.on("error", (err) => {
                     console.log(err);
                 });
-                
             });
 
             req.end();
