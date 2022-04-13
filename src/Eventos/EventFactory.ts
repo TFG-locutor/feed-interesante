@@ -170,6 +170,7 @@ class EventFactory {
             case "contest":
                 //No se comprueba que la operación no sea de tipo delete, porque en ese caso tienes problemas más grandes (el concurso que estabas locutando ya no existe)
                 var evCon = ev as ContestEvent;
+                //console.log(evCon);
                 //console.log(evCon)
                 this.sb_freeze_duration = evCon.scoreboard_freeze_duration;
                 this.contest_end = evCon.end_time;

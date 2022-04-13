@@ -23,8 +23,13 @@ try{
     let eventEmiter : Subject<Evento> = new Subject<Evento>();
     let apiReader = new APIReader(conf.url, conf.port, conf.contest_id, conf.api_version, conf.api_user, conf.api_password);
     
-    eventEmiter
-    const cbIniciar = () => {
+    const cbIniciar = (err: Error | null) => {
+
+        if(err!=null) {
+            console.log("Error mientras se realizaban las llamadas a la API: "+err.message);
+            return;
+        }
+
         console.log("Se han terminado las llamadas a la API");
         apiReader.suscribe_feed(eventEmiter);
 

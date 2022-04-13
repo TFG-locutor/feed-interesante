@@ -53,7 +53,7 @@ class ManagerPuntosDeVista {
         this.viewpoint_data.push( new PuntoDeVistaTiempo(ManagerPuntosDeVista.obs) );
     }
 
-    public static emitCreationEvents( eventEmiter : Subject<Evento>, callback: ()=>void) {
+    public static emitCreationEvents( eventEmiter : Subject<Evento>, callback: (err : Error | null)=>void = (err : any) => {console.log(err)}) {
 
         let conf = ConfigurationLoader.load();
         let emitChunch = (chunk : any, type: String) => {
@@ -75,7 +75,14 @@ class ManagerPuntosDeVista {
 
         let cuentaCallbacks = 0;
         let evConf = new EventoConfiguracion("");
-        let convergenciaCallBacks = (tipo: string, tam: number) => {
+        let cbError : boolean = false;
+        let convergenciaCallBacks = (err: Error | null, tipo: string  = "", tam: number = -1) => {
+            if(cbError) return;
+            if(err||tipo==""||tam==-1) {
+                callback(err);
+                cbError = true;
+                return;
+            }
             ++cuentaCallbacks;
             switch(tipo) {
                 case "problems": evConf.nProblemas = tam; break;
@@ -89,7 +96,8 @@ class ManagerPuntosDeVista {
                 eventEmiter.next(evConf);
                 var evs = EventFactory.ProcesarYEnriquecerEvento(evConf);
                 for(var _ev of evs) eventEmiter.next(_ev);
-                callback();
+                //No ha habido errores, se hace callback con error = null
+                callback(null);
             }
         }
 
@@ -99,7 +107,7 @@ class ManagerPuntosDeVista {
             path: '',
             method: 'GET'
         }
-
+        
         for(let tipo_entidad of tipos_entidad) {
             options.path = '/api/contests/'+conf.contest_id+'/'+tipo_entidad;
             let req = http.request(options, (resp: IncomingMessage) => {
@@ -109,12 +117,18 @@ class ManagerPuntosDeVista {
                 });
                 resp.on("end", () => {
                     let ents = JSON.parse(rawData);
+                    if(ents.code==404) {
+                        convergenciaCallBacks(new Error("No existe el concurso con id '"+conf.contest_id+"'"));
+                        return;
+                    }
                     for(let ent of ents) emitChunch(ent, tipo_entidad);
-                    convergenciaCallBacks(tipo_entidad, ents.length);
+                    convergenciaCallBacks(null, tipo_entidad, ents.length);
                 });
                 resp.on("error", (err) => {
-                    console.log(err);
+                    convergenciaCallBacks(err);
                 });
+            }).on("error", (err:Error) => {
+                convergenciaCallBacks(err);
             });
 
             req.end();
