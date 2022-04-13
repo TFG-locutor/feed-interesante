@@ -11,8 +11,46 @@ import { EventHandler } from "./SalidaEventos/EventHandler";
 import { EmitOnConsole } from "./SalidaEventos/EmitOnConsole";
 import { EventoBump } from "./Eventos/Custom/EventoBump";
 import { SaveOnLog } from "./SalidaEventos/SaveOnLog";
+import * as fs from 'fs';
+import { exit } from "process";
 
 console.log("Iniciando Programa...");
+
+//console.log("Argumentos: ");
+//console.log(process.argv);
+
+//Se mira si se ha pasado algún argumento de entrada
+if(process.argv.length>2) {
+    var dir : string = process.argv[2];
+    var stats : fs.Stats | null = null;
+    try {
+        stats = fs.statSync(dir);
+    } catch (err) {
+        console.log("Error, no existe el fichero o directorio '"+dir+"'");
+        process.exit(1);
+    }
+    
+    if(stats==null||!stats.isFile() ) {
+        console.log("Error, '"+dir+"' no es un fichero");
+        process.exit(1);
+    }
+
+    console.log("Leyendo feed de fichero '"+dir+"'")
+
+    var rawData = fs.readFileSync(dir);
+    try{
+        //console.log(rawData.toString());
+        
+        //TODO: implementar esto
+        //hay que valorar si se hacen o no las llamadas a la API
+        console.log("Lectura desde fichero aún no implementada, terminando programa");
+        
+        process.exit(0);
+    } catch(err) {
+        console.log("Formato de json no válido");
+        process.exit(1);
+    }
+}
 
 //Punto de inicio del programa
 

@@ -16,6 +16,7 @@ import { ManagerPuntosDeVista } from "../PuntosDeVista/ManagerPuntosDeVista";
 import { CambioEstado, EventoCambioEstado, TipoCambioEstado } from "./Custom/EventoCambioEstado";
 import moment from "moment";
 import { TEquipoData, TGrupoData, TJudTypeData, TOrganizacionData, TProblemData, TSubData } from "../InternalDataTypes";
+import { StateEvent } from "./StateEvent";
 
 
 //singleton
@@ -115,6 +116,7 @@ class EventFactory {
             case "problems": return new ProblemEvent(json.data, json.op, json.time);
             case "submissions": return new SubmissionEvent(json.data, json.op, json.time);
             case "teams": return new TeamEvent(json.data, json.op, json.time);
+            case "state": return new StateEvent(json.data, json.op, json.time);
             case "runs": case "state": return null;//new DummyEvent();
             default: throw "Evento no reconocido: "+json.type;
         }

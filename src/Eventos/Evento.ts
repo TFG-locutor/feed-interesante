@@ -24,7 +24,7 @@ abstract class Evento{
                     case "moment":
                         prop_value = moment(new Date(json[prop_name]));
                         break;
-                    default: throw "Tipo '' no reconocido para construir un campo";
+                    default: throw "Tipo '"+arr[1]+"' no reconocido para construir un campo";
                 }
             } else if(arr.length==1) {
                 prop_value = json[prop]==undefined?null:json[prop];
