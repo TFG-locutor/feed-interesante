@@ -1,4 +1,4 @@
-import { Confinode, ConfinodeResult, literal, numberItem, stringItem } from "confinode"
+import { booleanItem, Confinode, ConfinodeResult, literal, numberItem, stringItem } from "confinode"
 import path from "path"
 
 //Manuales para cambiar la configuración:
@@ -8,7 +8,8 @@ import path from "path"
 interface Configuration {
     readonly url: string;
     readonly port: number;
-    readonly api_version: string;
+    readonly https: boolean;
+    readonly allow_expired_tls: boolean;
     readonly contest_id: string;
     readonly api_user: string;
     readonly api_password: string;
@@ -21,7 +22,8 @@ abstract class ConfigurationLoader {
         const description = literal<Configuration>({
             url: stringItem(),
             port: numberItem(),
-            api_version: stringItem(),
+            https: booleanItem(),
+            allow_expired_tls: booleanItem(),
             contest_id: stringItem(),
             api_user: stringItem(),
             api_password: stringItem()
@@ -41,7 +43,8 @@ abstract class ConfigurationLoader {
         return {
             url: datos.configuration.url,
             port: datos.configuration.port,
-            api_version: datos.configuration.api_version,
+            https: datos.configuration.https,
+            allow_expired_tls: datos.configuration.allow_expired_tls,
             contest_id: datos.configuration.contest_id,
             api_user: datos.configuration.api_user,
             api_password: datos.configuration.api_password

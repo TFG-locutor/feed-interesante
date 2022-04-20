@@ -8,27 +8,23 @@ import { EventFactory } from "./Eventos/EventFactory";
 import { Evento } from "./Eventos/Evento";
 
 const http = require('http');
-
-function callbackEjemplo(evento:string) {
-    console.log("Evento interesante: " + evento);
-    //console.log(evento);
-}
+const https = require('https');
 
 class APIReader {
 
     hostname: string;
     port: number;
     contest_id: string;
-    api_version: string;
+    https: boolean;
     authuser: string;
     authpasswd: string;
 
 
-    constructor(hostname: string, port: number, contest_id: string, api_version: string, authuser: string, authpasswd: string) {
+    constructor(hostname: string, port: number, contest_id: string, https: boolean, authuser: string, authpasswd: string) {
         this.hostname = hostname;
         this.contest_id = contest_id;
         this.port = port;
-        this.api_version = api_version;
+        this.https = https;
         this.authuser = authuser;
         this.authpasswd = authpasswd;
     }
@@ -37,20 +33,19 @@ class APIReader {
     public suscribe_feed(eventEmiter : Subject<Evento>) {
 
             console.log("Iniciando escucha en el servidor "+this.hostname+", puerto "+this.port);
-            const options = {
+            let options = {
                 hostname: this.hostname,
                 port: this.port,
-                //path: '/api/'+this.api_version+'/contests/'+this.contest_id+'/event-feed',
                 path: '/api/contests/'+this.contest_id+'/event-feed',
                 method: 'GET',
-                auth: this.authuser+':'+this.authpasswd,
+                auth: this.authuser.length>0 ? this.authuser+':'+this.authpasswd : null,
                 qs: {
                     strict: false,
                     stream: true
                 }
             }
-
-            http.get(options, ( res : IncomingMessage) => {
+            var proto = this.https ? https : http;
+            proto.get(options, ( res : IncomingMessage) => {
                 const { statusCode} = res;
                 const contentType:any = res.headers['content-type'];
                 if (statusCode !== 200) {
@@ -141,19 +136,19 @@ class APIReader {
             const options = {
                 hostname: this.hostname,
                 port: this.port,
-                path: '/api/'+this.api_version+'/contests/'+this.contest_id+'/event-feed',
+                path: '/api/contests/'+this.contest_id+'/event-feed',
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                auth: this.authuser+':'+this.authpasswd,
+                auth: this.authuser.length>0 ? this.authuser+':'+this.authpasswd : null,
                 qs: {
                     strict: false,
                     stream: true
                 }
             }
-
-            http.get(options, ( res : IncomingMessage) => {
+            var proto = this.https ? https : http;
+            proto.get(options, ( res : IncomingMessage) => {
                 const { statusCode} = res;
                 const contentType:any = res.headers['content-type'];
                 if (statusCode !== 200) {
@@ -238,15 +233,16 @@ class APIReader {
 
     public start_listen() {
         console.log("Iniciando escucha en el servidor "+this.hostname+", puerto "+this.port);
-        http.get({
+        var proto = this.https ? https : http;
+        proto.get({
             hostname: this.hostname,
             port: this.port,
-            path: '/api/'+this.api_version+'/contests/'+this.contest_id+'/event-feed',
+            path: '/api/contests/'+this.contest_id+'/event-feed',
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
             },
-            auth: 'admin:admin',
+            auth: this.authuser.length>0 ? this.authuser+':'+this.authpasswd : null,
             qs: {
                 strict: false,
                 stream: true

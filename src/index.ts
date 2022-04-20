@@ -58,8 +58,10 @@ try{
     console.log("Cargando configuración")
     let conf : Configuration = ConfigurationLoader.load();
 
+    if(conf.allow_expired_tls) process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
     let eventEmiter : Subject<Evento> = new Subject<Evento>();
-    let apiReader = new APIReader(conf.url, conf.port, conf.contest_id, conf.api_version, conf.api_user, conf.api_password);
+    let apiReader = new APIReader(conf.url, conf.port, conf.contest_id, conf.https, conf.api_user, conf.api_password);
     
     const cbIniciar = (err: Error | null) => {
 

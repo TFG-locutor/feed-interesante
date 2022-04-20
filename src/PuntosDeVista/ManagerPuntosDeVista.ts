@@ -10,9 +10,9 @@ import { PuntoDeVistaScoreboard } from "./PuntoDeVistaScoreboard";
 import { PuntoDeVistaEquipo } from "./PuntoDeVistaEquipo";
 import { PuntoDeVistaGrupo } from "./PuntoDeVistaGrupo";
 import { EventoConfiguracion } from "../Eventos/Custom/EventoConfiguracion";
-import moment from "moment";
 import { PuntoDeVistaOrganizacion } from "./PuntoDeVistaOrganizacion";
 const http = require('http');
+const https = require('https');
 
 
 //Antes de llamar a getInstance es necesario llamar a setObservable una única vez
@@ -105,12 +105,17 @@ class ManagerPuntosDeVista {
             hostname: conf.url,
             port: conf.port,
             path: '',
-            method: 'GET'
+            method: 'GET',
+            auth: conf.api_user.length>0 ? conf.api_user+':'+conf.api_password : null,
+            qs:{
+                public: true
+            }
         }
         
         for(let tipo_entidad of tipos_entidad) {
             options.path = '/api/contests/'+conf.contest_id+'/'+tipo_entidad;
-            let req = http.request(options, (resp: IncomingMessage) => {
+            let proto = conf.https ? https : http;
+            let req = proto.request(options, (resp: IncomingMessage) => {
                 let rawData : string = '';
                 resp.on("data", (chunk) => {
                     rawData += chunk;

@@ -33,6 +33,7 @@ class TeamEvent extends Evento {
     name!: string;
     display_name!: string;
     members!: string;
+    hidden!: boolean;
     /*
     photo: [ {
         href: string,
@@ -43,7 +44,7 @@ class TeamEvent extends Evento {
     */
 
     constructor(json : any, op: string, _moment: string) {
-        super(op, "team", _moment, json, ["id","organization_id","group_ids","affiliation","nationality","icpc_id","name","display_name","members"/*,"photo"*/]);
+        super(op, "team", _moment, json, ["id","organization_id","group_ids","affiliation","nationality","icpc_id","name","display_name","members","hidden"/*,"photo"*/]);
     }
 
 }
