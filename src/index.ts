@@ -13,6 +13,7 @@ import { EventoBump } from "./Eventos/Custom/EventoBump";
 import { SaveOnLog } from "./SalidaEventos/SaveOnLog";
 import * as fs from 'fs';
 import { exit } from "process";
+import { tweetEvent } from "./SalidaEventos/tweetEvent";
 
 console.log("Iniciando Programa...");
 
@@ -81,6 +82,11 @@ try{
         let logEvHandler : EventHandler = new SaveOnLog();
         ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
             logEvHandler.observeNewEventFeed(pv.getEventEmiter());
+        });
+
+        let tweetEventHandler : EventHandler = new tweetEvent();
+        ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
+            tweetEventHandler.observeNewEventFeed(pv.getEventEmiter());
         });
     }
 
