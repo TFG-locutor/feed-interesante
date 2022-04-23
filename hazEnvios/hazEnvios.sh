@@ -79,7 +79,7 @@ submit() {
 
 	 local solFile
 	 if [ $veredicto == "AC" ]; then
-		  solFile="sols/$prob/solution.$lang"
+		  solFile="sols/p1/solution.$lang"
 	 else
 		  solFile="sols/$ver.$lang"
 	 fi
@@ -113,7 +113,8 @@ while true; do
 
 	 # Elegimos problema para enviar
 	 problemNumber=$(random $numProblems FicherosDeSoporte/probProblemas.txt)
-	 idProblema=$(curl -s "$contest/problems" | jq -r '.['$problemNumber'-1].short_name')
+	 idProblema=$(curl -s "$contest/problems" | jq -r '.['$problemNumber'-1].id')
+	 echo "Enviando problema $idProblema"
 
 	 # Y qué usuario lo hará
 	 totalUsers=$(cat FicherosDeSoporte/accounts.tsv | wc -l)

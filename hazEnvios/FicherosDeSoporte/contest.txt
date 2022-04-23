@@ -1,1 +1,1 @@
-http://192.168.100.150/api/contests/concurso
+http://192.168.100.150/api/v4/contests/concurso
