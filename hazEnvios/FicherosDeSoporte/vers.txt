@@ -1,0 +1,6 @@
+AC
+WA
+TLE
+RTE
+NO
+CE

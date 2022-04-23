@@ -1,0 +1,1 @@
+curl --user TLE:sesamo -X POST "https://test-cds.programa-me.com/api/v4/contests/pr/submissions" -H  "accept: application/json" -H  "Content-Type: multipart/form-data" -F "problem=B" -F "language=cpp" -F "code=@solution.cpp;type=text/x-c++src"
