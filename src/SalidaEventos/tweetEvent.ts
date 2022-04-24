@@ -1,23 +1,12 @@
-import got from "got/dist/source";
 import { connectLogger } from "log4js";
 import { Observable } from "rxjs";
-import { TwitterClient } from "twitter-api-client";
 import { EventHandler } from "./EventHandler";
 import { EventoSalida } from "../PuntosDeVista/PuntoDeVista";
 
 class tweetEvent extends EventHandler{
     twitterClient : TwitterClient;
     constructor(){
-        super();
-        this.twitterClient = new TwitterClient(
-            {apiKey:"MsJW8O2REJlo6z9VKzfFAcyQY", apiSecret:"Ili0VHylBFzoCK8sjIopr6JUuuSTpXohfdDkCAVMnwByydjBWm", 
-            accessToken:"1517889802640801792-sr9qGYUqpV02AbZMr0aXseRj6jS6ER"
-            , accessTokenSecret:"bBmf9WQxtwIzX98O8Odo3ANsQrHsWZw2Fwat92EDgThZO)"});
-
-
-
-
-        
+        super();      
     }
     
     
