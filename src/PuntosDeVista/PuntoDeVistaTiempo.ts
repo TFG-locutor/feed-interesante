@@ -3,7 +3,7 @@ import { Observable } from "rxjs";
 import { ContestEvent } from "../Eventos/ContestEvent";
 import { CambioEstado, EventoCambioEstado, TipoCambioEstado } from "../Eventos/Custom/EventoCambioEstado";
 import { Evento } from "../Eventos/Evento";
-import { PuntoDeVista } from "./PuntoDeVista";
+import { EventoSalida, PuntoDeVista } from "./PuntoDeVista";
 
 class PuntoDeVistaTiempo extends PuntoDeVista {
 
@@ -36,23 +36,35 @@ class PuntoDeVistaTiempo extends PuntoDeVista {
                 switch(evCE.cambio) {
                     case CambioEstado.MarcadorCongelado:
                         if(forward) {
-                            this.emitir(evCE.moment.format()+": Se ha congelado el marcador");
+                            var eventoSalida = new EventoSalida("Se ha congelado el marcador",
+                        EventoSalida.priority.maxima,[],{},evCE.moment.format(),EventoSalida.eventtype.accepted_answer);
+                            this.emitir(eventoSalida);
                         } else {
-                            this.emitir(evCE.moment.format()+": Se ha descongelado el marcador");
+                            var eventoSalida = new EventoSalida("Se ha descongelado el marcador",
+                        EventoSalida.priority.maxima,[],{},evCE.moment.format(),EventoSalida.eventtype.accepted_answer);
+                            this.emitir(eventoSalida);
                         }
                         break;
                     case CambioEstado.ConcursoIniciado:
                         if(forward) {
-                            this.emitir(evCE.moment.format()+": Ha empezado el concurso");
+                            var eventoSalida = new EventoSalida("Ha empezado el concurso",
+                        EventoSalida.priority.maxima,[],{},evCE.moment.format(),EventoSalida.eventtype.accepted_answer);
+                            this.emitir(eventoSalida);
                         } else {
-                            this.emitir(evCE.moment.format()+": El concurso aún no ha empezado");
+                            var eventoSalida = new EventoSalida("El concurso aún no ha empezado",
+                        EventoSalida.priority.maxima,[],{},evCE.moment.format(),EventoSalida.eventtype.accepted_answer);
+                            this.emitir(eventoSalida);
                         }
                         break;
                     case CambioEstado.ConcursoFinalizado:
                         if(forward) {
-                            this.emitir(evCE.moment.format()+": Ha terminado el concurso");
+                            var eventoSalida = new EventoSalida("Ha terminado el concurso",
+                        EventoSalida.priority.maxima,[],{},evCE.moment.format(),EventoSalida.eventtype.accepted_answer);
+                            this.emitir(eventoSalida);
                         } else {
-                            this.emitir(evCE.moment.format()+": El concurso aún no ha terminado");
+                            var eventoSalida = new EventoSalida("El concurso aún no ha terminado",
+                        EventoSalida.priority.maxima,[],{},evCE.moment.format(),EventoSalida.eventtype.accepted_answer);
+                            this.emitir(eventoSalida);
                         }
                         break;
                 }

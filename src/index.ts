@@ -84,10 +84,10 @@ try{
             logEvHandler.observeNewEventFeed(pv.getEventEmiter());
         });
 
-        let tweetEventHandler : EventHandler = new tweetEvent();
+        /*let tweetEventHandler : EventHandler = new tweetEvent();
         ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
             tweetEventHandler.observeNewEventFeed(pv.getEventEmiter());
-        });
+        });*/
     }
 
     ManagerPuntosDeVista.setObservable(eventEmiter.asObservable());

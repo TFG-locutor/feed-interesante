@@ -4,6 +4,7 @@ import { configure, getLogger, Log4js, Logger } from "log4js";
 
 import { writeFile } from 'fs';
 import moment from "moment";
+import { EventoSalida } from "../PuntosDeVista/PuntoDeVista";
 
 class SaveOnLog extends EventHandler{
     constructor(){
@@ -16,7 +17,7 @@ class SaveOnLog extends EventHandler{
         
     }
     
-    procesar(evento: string): void {
+    procesar(evento: EventoSalida): void {
 
         getLogger().debug(evento);
         /* writeFile('log.txt', evento, (err) => {

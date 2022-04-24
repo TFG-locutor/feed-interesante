@@ -1,12 +1,13 @@
 import { Observable } from "rxjs";
+import { EventoSalida } from "../PuntosDeVista/PuntoDeVista";
 
 abstract class EventHandler {
-    eventFeeds : Array<Observable<String>>;
+    eventFeeds : Array<Observable<EventoSalida>>;
     constructor() {
-        this.eventFeeds = new Array<Observable<String>>();
+        this.eventFeeds = new Array<Observable<EventoSalida>>();
     }
 
-    observeNewEventFeed(eventFeed : Observable<String>){
+    observeNewEventFeed(eventFeed : Observable<EventoSalida>){
         this.eventFeeds.push(eventFeed);
 
         const that = this;
@@ -16,7 +17,7 @@ abstract class EventHandler {
             complete() { console.log('done');}
         });
     }
-    abstract procesar( evento : String ) : void;
+    abstract procesar( evento : EventoSalida ) : void;
 }
 
 export { EventHandler };

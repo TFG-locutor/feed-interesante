@@ -4,7 +4,7 @@ import { Observable } from "rxjs";
 import { ContestEvent } from "../Eventos/ContestEvent";
 import { EventoVeredicto } from "../Eventos/Custom/EventoVeredicto";
 import { Evento } from "../Eventos/Evento";
-import { PuntoDeVista } from "./PuntoDeVista";
+import { EventoSalida, PuntoDeVista } from "./PuntoDeVista";
 
 type TTeamSBData = {
     score: number;
@@ -101,7 +101,9 @@ class PuntoDeVistaOrganizacion extends PuntoDeVista{
                 //TODO: refactorizar esto
 
                 if(pastRanking!=tData.ranking_pos) {
-                    this.emitir(evVer.moment.format()+": El equipo "+evVer.equipo+" ("+evVer.id_equipo+") ha pasado de la posición "+pastRanking+" a la posición "+tData.ranking_pos+" dentro de la organización "+this.nombre_organizacion+" ("+this.id_organizacion+")"+" después de recibir un "+evVer.resultado+" en el problema "+evVer.problema+" ("+evVer.id_problema+")");
+                    var eventoSalida = new EventoSalida("El equipo "+evVer.equipo+" ("+evVer.id_equipo+") ha pasado de la posición "+pastRanking+" a la posición "+tData.ranking_pos+" dentro de la organización "+this.nombre_organizacion+" ("+this.id_organizacion+")"+" después de recibir un "+evVer.resultado+" en el problema "+evVer.problema+" ("+evVer.id_problema+")",
+                        EventoSalida.priority.media,[],{},evVer.moment.format(),EventoSalida.eventtype.accepted_answer);
+                    this.emitir(eventoSalida);
                 }
 
                 break;

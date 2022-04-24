@@ -1,4 +1,5 @@
 import { Observable } from "rxjs";
+import { EventoSalida } from "../PuntosDeVista/PuntoDeVista";
 import { EventHandler } from "./EventHandler";
 
 class EmitOnConsole extends EventHandler{
@@ -6,7 +7,7 @@ class EmitOnConsole extends EventHandler{
         super();
     }
     
-    procesar(evento: String): void {
+    procesar(evento: EventoSalida): void {
         console.log(evento);
     }
 

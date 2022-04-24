@@ -1,9 +1,9 @@
 {
-    "url": "cds.juezonline.com",
-    "port": 443,
+    "url": "sobremesamario",
+    "port": 8443,
     "https": true,
-    "allow_expired_tls": false,
-    "contest_id": "Multisede",
+    "allow_expired_tls": true,
+    "contest_id": "concurso",
     "api_user": "",
     "api_password": ""
 }

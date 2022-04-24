@@ -5,7 +5,7 @@ import { EventoConfiguracion } from "../Eventos/Custom/EventoConfiguracion";
 import { EventoEnvio } from "../Eventos/Custom/EventoEnvio";
 import { EventoVeredicto } from "../Eventos/Custom/EventoVeredicto";
 import { Evento } from "../Eventos/Evento";
-import { PuntoDeVista } from "./PuntoDeVista";
+import { EventoSalida, PuntoDeVista } from "./PuntoDeVista";
 
 class PuntoDeVistaProblema extends PuntoDeVista{
     
@@ -56,11 +56,16 @@ class PuntoDeVistaProblema extends PuntoDeVista{
         switch(evento.tipo) {
             case "envio":
                 var evEnv = evento as EventoEnvio;
-                this.emitir(evEnv.moment.format()+": Envio con id "+evEnv.id_envio+" al problema '"+evEnv.problema+"' ("+evEnv.id_problema+") del equipo '"+evEnv.equipo+"' ("+evEnv.id_equipo+")");
+                var eventoSalida = new EventoSalida("Envio con id "+evEnv.id_envio+" al problema '"+evEnv.problema+"' ("+evEnv.id_problema+") del equipo '"+evEnv.equipo+"' ("+evEnv.id_equipo+")",
+                        EventoSalida.priority.minima,[],{},evEnv.moment.format(),EventoSalida.eventtype.accepted_answer);
+                this.emitir(eventoSalida);
                 break;
             case "veredicto":
                 var evVer = evento as EventoVeredicto;
-                this.emitir(evVer.moment.format()+": El resultado del envío "+evVer.id_envio+" ha sido "+evVer.resultado+ ", lleva "+evVer.n_intento+" intentos" );
+                var eventoSalida = new EventoSalida("El resultado del envío "+evVer.id_envio+" ha sido "+evVer.resultado+ ", lleva "+evVer.n_intento+" intentos",
+                        EventoSalida.priority.baja,[],{},evVer.moment.format(),EventoSalida.eventtype.accepted_answer);
+
+                this.emitir(eventoSalida);
 
                 if(evVer.resuelto){
                     ++this.nVecesResuelto;
@@ -68,19 +73,28 @@ class PuntoDeVistaProblema extends PuntoDeVista{
                     this.last_AC = evVer.moment;
                     if(!this.ha_sido_resuelto) {
                         this.ha_sido_resuelto = true;
-                        this.emitir(evVer.moment.format()+": El equipo "+evVer.equipo+" ("+evVer.id_equipo+") ha sido el primero en resolver el problema '"+evVer.problema+"' ("+this.id_problema+") - ["+evVer.n_intento+" intento/s]");
+                        var eventoSalida = new EventoSalida("El equipo "+evVer.equipo+" ("+evVer.id_equipo+") ha sido el primero en resolver el problema '"+evVer.problema+"' ("+this.id_problema+") - ["+evVer.n_intento+" intento/s]",
+                        EventoSalida.priority.alta,[],{},evVer.moment.format(),EventoSalida.eventtype.accepted_answer);
+                        this.emitir(eventoSalida);
                     }
                     if(this.nVecesResuelto==this.nEquipos) {
-                        this.emitir(evVer.moment.format()+": El problema "+this.nombre_problema+" ("+this.id_problema+") ha sido resuelto por todos los equipos!");
+                        var eventoSalida = new EventoSalida("El problema "+this.nombre_problema+" ("+this.id_problema+") ha sido resuelto por todos los equipos!",
+                        EventoSalida.priority.alta,[],{},evVer.moment.format(),EventoSalida.eventtype.accepted_answer);
+                        this.emitir(eventoSalida);
+
                     }
                 } else if(evVer.penaliza) {
                     if(!this.msgCuestaResulverUnProblema.has(evVer.id_envio)&&evVer.n_intento>=this.nIntentosParaConsiderarQueTeCuesta) {
                         this.msgCuestaResulverUnProblema.add(evVer.id_envio);
-                        this.emitir(evVer.moment.format()+": Al equipo '"+evVer.equipo+"' ("+evVer.id_equipo+") le está costando resolver el problema "+this.nombre_problema+" ("+this.id_problema+")");
+                        var eventoSalida = new EventoSalida("Al equipo '"+evVer.equipo+"' ("+evVer.id_equipo+") le está costando resolver el problema "+this.nombre_problema+" ("+this.id_problema+")",
+                        EventoSalida.priority.media,[],{},evVer.moment.format(),EventoSalida.eventtype.accepted_answer);
+                        this.emitir(eventoSalida);
                     }
                     if(!this.msgCuestaResulverUnProblemaMuyResuelto.has(evVer.id_envio)&&evVer.n_intento>=this.nIntentosParaConsiderarQueTeCuestaAlgoResuelto&&(this.nVecesResuelto/this.nEquipos)>this.proporcionVecesResueltoParaConsiderarAlgoFacil) {
                         this.msgCuestaResulverUnProblemaMuyResuelto.add(evVer.id_envio);
-                        this.emitir(evVer.moment.format()+": Al equipo '"+evVer.equipo+"' ("+evVer.id_equipo+") le está costando resolver el problema "+this.nombre_problema+" ("+this.id_problema+"), que tiene ya bastantes envios correctos");
+                        var eventoSalida = new EventoSalida("Al equipo '"+evVer.equipo+"' ("+evVer.id_equipo+") le está costando resolver el problema "+this.nombre_problema+" ("+this.id_problema+"), que tiene ya bastantes envios correctos",
+                        EventoSalida.priority.alta,[],{},evVer.moment.format(),EventoSalida.eventtype.accepted_answer);
+                        this.emitir(eventoSalida);
                     }
                 }
                 
@@ -89,7 +103,9 @@ class PuntoDeVistaProblema extends PuntoDeVista{
                 //Ha pasado mucho tiempo desde el último AC
                 if(this.last_AC!=null&&!this.msgLongSinceLastAC&&(this.last_AC.diff(evento.moment)/60000)>=this.minsCosideredLongSinceLastAC) {
                     this.msgLongSinceLastAC = true;
-                    this.emitir(evento.moment.format()+": Ha pasado mucho tiempo ("+this.minsCosideredLongSinceLastAC+"mins) desde que el problema "+this.nombre_problema+" ("+this.id_problema+") se ha solucionado por última vez");
+                    var eventoSalida = new EventoSalida("Ha pasado mucho tiempo ("+this.minsCosideredLongSinceLastAC+"mins) desde que el problema "+this.nombre_problema+" ("+this.id_problema+") se ha solucionado por última vez",
+                        EventoSalida.priority.alta,[],{},evento.moment.format(),EventoSalida.eventtype.accepted_answer);
+                        this.emitir(eventoSalida);
                 }
                 break;
             case "configuracion":

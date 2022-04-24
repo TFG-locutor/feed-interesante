@@ -4,7 +4,7 @@ import { EventoConfiguracion } from "../Eventos/Custom/EventoConfiguracion";
 import { EventoEnvio } from "../Eventos/Custom/EventoEnvio";
 import { EventoVeredicto } from "../Eventos/Custom/EventoVeredicto";
 import { Evento } from "../Eventos/Evento";
-import { PuntoDeVista } from "./PuntoDeVista";
+import { EventoSalida, PuntoDeVista } from "./PuntoDeVista";
 
 class PuntoDeVistaEquipo extends PuntoDeVista{
     
@@ -49,14 +49,22 @@ class PuntoDeVistaEquipo extends PuntoDeVista{
                     if(evVer.n_intento==1) ++this.nProblemasResueltosALaPrimera;
                     if(!this.haResueltoUnProblema) {
                         this.haResueltoUnProblema = true;
-                        this.emitir(evVer.moment.format()+": El equipo "+this.nombre_equipo+" ("+this.id_equipo+") ha resuelto su primer problema!, "+evVer.problema+" ("+evVer.id_problema+")");
+                        var eventoSalida = new EventoSalida("El equipo "+this.nombre_equipo+" ("+this.id_equipo+") ha resuelto su primer problema!, "+evVer.problema+" ("+evVer.id_problema+")",
+                        EventoSalida.priority.media,[],{},evVer.moment.format(),EventoSalida.eventtype.accepted_answer);
+                        this.emitir(eventoSalida);
                     }
                     if(this.nProblemasResueltos==this.nProblemas) {
-                        this.emitir(evVer.moment.format()+": El equipo "+this.nombre_equipo+" ("+this.id_equipo+") ha resuelto todos los problemas!")
+                        var eventoSalida = new EventoSalida("El equipo "+this.nombre_equipo+" ("+this.id_equipo+") ha resuelto todos los problemas!",
+                        EventoSalida.priority.maxima,[],{},evVer.moment.format(),EventoSalida.eventtype.accepted_answer);
+                        //this.emitir()
+                        this.emitir(eventoSalida);
                     }
                     if(this.nProblemasResueltos>=this.minProblemasResueltosParaComparar&&!this.msgNumAltoProblemasALaPrimera&&this.nProblemasResueltosALaPrimera/this.nProblemasResueltos>=this.proporcionProblemasResueltosALaPrimeraParaQueSeaInteresante) {
                         this.msgNumAltoProblemasALaPrimera = true;
-                        this.emitir(evVer.moment.format()+": El equipo "+this.nombre_equipo+" ("+this.id_equipo+") ha resuelto muchos problemas al primer intento!");
+                        var eventoSalida = new EventoSalida("El equipo "+this.nombre_equipo+" ("+this.id_equipo+") ha resuelto muchos problemas al primer intento!",
+                        EventoSalida.priority.maxima,[],{},evVer.moment.format(),EventoSalida.eventtype.accepted_answer);
+                        //this.emitir(evVer.moment.format()+": El equipo "+this.nombre_equipo+" ("+this.id_equipo+") ha resuelto muchos problemas al primer intento!");
+                        this.emitir(eventoSalida);
                     }
                 }
                 break;
