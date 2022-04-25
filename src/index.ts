@@ -77,17 +77,17 @@ try{
         let evHandler : EventHandler = new EmitOnConsole();
         ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
             evHandler.observeNewEventFeed(pv.getEventEmiter());
-        });
+        }); 
 
         let logEvHandler : EventHandler = new SaveOnLog();
         ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
             logEvHandler.observeNewEventFeed(pv.getEventEmiter());
         });
 
-        /*let tweetEventHandler : EventHandler = new tweetEvent();
+        let tweetEventHandler : EventHandler = new tweetEvent();
         ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
             tweetEventHandler.observeNewEventFeed(pv.getEventEmiter());
-        });*/
+        });
     }
 
     ManagerPuntosDeVista.setObservable(eventEmiter.asObservable());
