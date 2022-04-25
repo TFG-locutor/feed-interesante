@@ -14,6 +14,7 @@ import { SaveOnLog } from "./SalidaEventos/SaveOnLog";
 import * as fs from 'fs';
 import { exit } from "process";
 import { tweetEvent } from "./SalidaEventos/tweetEvent";
+import { emitOnRestServer } from "./SalidaEventos/emitOnRestServer";
 
 console.log("Iniciando Programa...");
 
@@ -74,19 +75,24 @@ try{
         console.log("Se han terminado las llamadas a la API");
         apiReader.suscribe_feed(eventEmiter);
 
-        let evHandler : EventHandler = new EmitOnConsole();
+        /* let evHandler : EventHandler = new EmitOnConsole();
         ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
             evHandler.observeNewEventFeed(pv.getEventEmiter());
-        }); 
+        });  */
 
         let logEvHandler : EventHandler = new SaveOnLog();
         ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
             logEvHandler.observeNewEventFeed(pv.getEventEmiter());
         });
 
-        let tweetEventHandler : EventHandler = new tweetEvent();
+        /* let tweetEventHandler : EventHandler = new tweetEvent();
         ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
             tweetEventHandler.observeNewEventFeed(pv.getEventEmiter());
+        }); */
+
+        let serverEmit : EventHandler = new emitOnRestServer();
+        ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
+            serverEmit.observeNewEventFeed(pv.getEventEmiter());
         });
     }
 
