@@ -102,19 +102,19 @@ class ManagerPuntosDeVista {
         }
 
         let options = {
-            hostname: conf.url,
-            port: conf.port,
+            hostname: conf.cds.url,
+            port: conf.cds.port,
             path: '',
             method: 'GET',
-            auth: conf.api_user.length>0 ? conf.api_user+':'+conf.api_password : null,
+            auth: conf.cds.api_user.length>0 ? conf.cds.api_user+':'+conf.cds.api_password : null,
             qs:{
                 public: true
             }
         }
         
         for(let tipo_entidad of tipos_entidad) {
-            options.path = '/api/contests/'+conf.contest_id+'/'+tipo_entidad;
-            let proto = conf.https ? https : http;
+            options.path = '/api/contests/'+conf.cds.contest_id+'/'+tipo_entidad;
+            let proto = conf.cds.https ? https : http;
             let req = proto.request(options, (resp: IncomingMessage) => {
                 let rawData : string = '';
                 resp.on("data", (chunk) => {
@@ -123,7 +123,7 @@ class ManagerPuntosDeVista {
                 resp.on("end", () => {
                     let ents = JSON.parse(rawData);
                     if(ents.code==404) {
-                        convergenciaCallBacks(new Error("No existe el concurso con id '"+conf.contest_id+"'"));
+                        convergenciaCallBacks(new Error("No existe el concurso con id '"+conf.cds.contest_id+"'"));
                         return;
                     }
                     for(let ent of ents) emitChunch(ent, tipo_entidad);

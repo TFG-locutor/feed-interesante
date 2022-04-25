@@ -3,6 +3,7 @@
 import { IncomingMessage } from "http";
 import moment from "moment";
 import { Observable, Subject } from "rxjs";
+import { Configuration } from "./config";
 import { EventoBump } from "./Eventos/Custom/EventoBump";
 import { EventFactory } from "./Eventos/EventFactory";
 import { Evento } from "./Eventos/Evento";
@@ -20,13 +21,13 @@ class APIReader {
     authpasswd: string;
 
 
-    constructor(hostname: string, port: number, contest_id: string, https: boolean, authuser: string, authpasswd: string) {
-        this.hostname = hostname;
-        this.contest_id = contest_id;
-        this.port = port;
-        this.https = https;
-        this.authuser = authuser;
-        this.authpasswd = authpasswd;
+    constructor(conf : Configuration) {
+        this.hostname = conf.cds.url;
+        this.contest_id = conf.cds.contest_id;
+        this.port = conf.cds.port;
+        this.https = conf.cds.https;
+        this.authuser = conf.cds.api_user;
+        this.authpasswd = conf.cds.api_password;
     }
 
 
@@ -67,8 +68,6 @@ class APIReader {
 
                     if((/^\n$/).test(chunk)) {
                         console.log("...");
-                        var bumpSecondaryEvents = EventFactory.ProcesarYEnriquecerEvento(new EventoBump(moment().format()));
-                        for(var bumpSecondaryEvent of bumpSecondaryEvents) eventEmiter.next(bumpSecondaryEvent);
                         return;
                     }
 
@@ -121,6 +120,10 @@ class APIReader {
                     } */
                     eventEmiter.complete();
                 });
+                setInterval(() => {
+                    var bumpSecondaryEvents = EventFactory.ProcesarYEnriquecerEvento(new EventoBump(moment().format()));
+                    for(var bumpSecondaryEvent of bumpSecondaryEvents) eventEmiter.next(bumpSecondaryEvent);
+                }, 1000);
             
             }).on("error", (err : Error) => {
                 eventEmiter.error(err)

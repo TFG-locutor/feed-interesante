@@ -245,12 +245,12 @@ class EventFactory {
                 break;
             case "problem":
                 let evPro = ev as ProblemEvent;
-                if(evPro.op=="manual_create") {
+                if(evPro.op=="manual_create" ||evPro.op=="create") {
                 //if((evPro.op=="create" && !this._problemas.has(evPro.id))||evPro.op=="update") {
                     if(this._problemas.get(evPro.id)==undefined) {
                         ManagerPuntosDeVista.registrarPuntoDeVistaProblema(evPro.id, evPro.name);
+                        this._problemas.set(evPro.id, { nombre: evPro.name });
                     }
-                    this._problemas.set(evPro.id, { nombre: evPro.name });
                 }
                 break;
             case "team":
@@ -266,21 +266,21 @@ class EventFactory {
                 break;
             case "group":
                 let evGro = ev as GroupEvent;
-                if(evGro.op=="manual_create") {
+                if(evGro.op=="manual_create" || evGro.op=="create") {
                 //if((evGro.op=="create" && !this._grupos.has(evGro.id)) ||evGro.op=="update") {
                     if(this._grupos.get(evGro.id)==undefined) {
                         ManagerPuntosDeVista.registrarPuntoDeVistaGrupo(evGro.id, evGro.name);
+                        this._grupos.set(evGro.id, {id: evGro.id, nombre: evGro.name, oculto: evGro.hidden});
                     }
-                    this._grupos.set(evGro.id, {id: evGro.id, nombre: evGro.name, oculto: evGro.hidden});
                 }
                 break;
             case "organization":
                 let evOrg = ev as OrganizationEvent;
-                if(evOrg.op=="manual_create") {
+                if(evOrg.op=="manual_create"||evOrg.op=="create") {
                     if(this._organizaciones.get(evOrg.id)==undefined) {
                         ManagerPuntosDeVista.registrarPuntoDeVistaOrganizacion(evOrg.id, evOrg.name);
+                        this._organizaciones.set(evOrg.id, {id: evOrg.id, nombre: evOrg.name});
                     }
-                    this._organizaciones.set(evOrg.id, {id: evOrg.id, nombre: evOrg.name});
                 }
             case "submission":
                 if(ev.op=="create") {

@@ -2,6 +2,7 @@ import { EventoSalida } from "../PuntosDeVista/PuntoDeVista";
 import { EventHandler } from "./EventHandler";
 
 import {createServer, IncomingMessage, Server, ServerResponse} from "http"
+import { ConfigurationLoader } from "../config";
 
 class emitOnRestServer extends EventHandler {
     responses  : ServerResponse[]
@@ -9,6 +10,7 @@ class emitOnRestServer extends EventHandler {
     constructor() {
         super();
         this.responses = [];
+        const conf = ConfigurationLoader.load();
         this.server = createServer((request , response) => {
             const { headers, method, url } = request;
             let body: any[] = [];
@@ -36,7 +38,8 @@ class emitOnRestServer extends EventHandler {
         
                 this.responses.push(response);
                 //response.write(JSON.stringify(responseBody));
-        
+                response.write("{\"status\": 200, \"msg\": \"conectado al feed interesante (por un mundo más limpio)\"}");
+
                 /* let i = 0;
                 let interval = setInterval(()=>{
                     response.write(" hola "+(i++));
@@ -44,13 +47,12 @@ class emitOnRestServer extends EventHandler {
         
                 //response.end();
             });
-        }).listen(1337); // Activates this server.
+        }).listen(conf.server_port); // Activates this server.
 
     }
 
-
-
     procesar(evento : EventoSalida) : void {
+        //console.log(evento);
         this.responses.forEach(response => {
             response.write(JSON.stringify(evento));
         });

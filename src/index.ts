@@ -60,10 +60,10 @@ try{
     console.log("Cargando configuración")
     let conf : Configuration = ConfigurationLoader.load();
 
-    if(conf.allow_expired_tls) process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    if(conf.cds.allow_expired_tls) process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
     let eventEmiter : Subject<Evento> = new Subject<Evento>();
-    let apiReader = new APIReader(conf.url, conf.port, conf.contest_id, conf.https, conf.api_user, conf.api_password);
+    let apiReader = new APIReader(conf);
     
     const cbIniciar = (err: Error | null) => {
 
@@ -75,10 +75,10 @@ try{
         console.log("Se han terminado las llamadas a la API");
         apiReader.suscribe_feed(eventEmiter);
 
-        /* let evHandler : EventHandler = new EmitOnConsole();
+        let evHandler : EventHandler = new EmitOnConsole();
         ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
             evHandler.observeNewEventFeed(pv.getEventEmiter());
-        });  */
+        });
 
         let logEvHandler : EventHandler = new SaveOnLog();
         ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
