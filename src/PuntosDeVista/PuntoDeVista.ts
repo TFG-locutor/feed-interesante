@@ -2,17 +2,32 @@ import { Evento } from "../Eventos/Evento";
 import { Observable, Subject } from 'rxjs';
 
 enum priority { 
-    minima = 'minima',
-    baja = 'baja',
-    media = 'media',
-    alta = 'alta',
-    maxima = 'maxima'
+    minima  ,
+    baja ,
+    media ,
+    alta ,
+    maxima
 }
 
 enum eventtype {
+    //problems
     accepted_answer = 'accepted_answer',
     not_accepted_answer     = 'not_accepted_answer',
-    scoreboard_change = 'scoreboard_change'
+
+    //teams actions
+
+    //scoreboard
+    general_scoreboard_change = 'general_scoreboard_change',
+    organization_scoreboard_change = 'organization_scoreboard_change',
+    group_scoreboard_change = 'group_scoreboard_change',
+    
+    //time
+    contest_start = 'contest_start',
+    contest_end = 'contest_end',
+    contest_freeze = 'contest_freeze',
+    contest_unfreeze = 'contest_unfreeze',
+    contest_not_started = 'contest_not_started',
+    contest_not_ended = 'contest_not_ended',
 }
 
 class idGenerator {
@@ -32,9 +47,7 @@ class EventoSalida {
     private time : String;
     private type: eventtype;
     static readonly priority = priority;
-    readonly priority = EventoSalida.priority;
     static readonly eventtype = eventtype;
-    readonly eventtype = EventoSalida.eventtype;
 
     constructor(message: string, prioridad: priority, tags: String[], info: {}, time: String , type: eventtype) {
         this.id = idGenerator.next();
