@@ -71,14 +71,14 @@ class EventoSalida {
     private id: number; 
     private message: string; 
     private prioridad: priority; 
-    private tags: String[]; 
+    private tags: string[]; 
     private info: {};
-    private time : String;
+    private time : string;
     private type: eventtype;
     static readonly priority = priority;
     static readonly eventtype = eventtype;
 
-    constructor(message: string, prioridad: priority, tags: String[], info: {}, time: String , type: eventtype) {
+    constructor(message: string, prioridad: priority, tags: string[], info: {}, time: string , type: eventtype) {
         this.id = idGenerator.next();
         this.message = message;
         this.prioridad = prioridad;
@@ -102,7 +102,7 @@ class EventoSalida {
         return this.prioridad
     }
 
-    public gettags() : String[] {
+    public gettags() : string[] {
         return this.tags
     }
 
@@ -110,7 +110,7 @@ class EventoSalida {
         return this.info
     }
 
-    public gettime() : String {
+    public gettime() : string {
         return this.time
     }
 
@@ -134,7 +134,7 @@ class EventoSalida {
         this.prioridad = prioridad;
     }
 
-    public settags(tags: String[]) {
+    public settags(tags: string[]) {
         this.tags = tags;
     }
 
@@ -142,7 +142,7 @@ class EventoSalida {
         this.info = info;
     }
 
-    public settime(time: String) {
+    public settime(time: string) {
         this.time = time;
     }
 
