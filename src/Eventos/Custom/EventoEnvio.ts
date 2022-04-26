@@ -2,7 +2,7 @@
 import { Evento } from "../Evento";
 
 //Evento emitido cuando se realza un envío a un problema que no se había resuelto antes
-
+//TODO: falta info de organizacion y categoria del equipo
 class EventoEnvio extends Evento {
 
     id_envio: string;

@@ -1,6 +1,24 @@
 import { Evento } from "../Eventos/Evento";
 import { Observable, Subject } from 'rxjs';
 
+/*
+Prioridad: 0 al 4
+0 / mínima:a casi nadie le interesan, ya sea porque casi seguramente ese evento se reemita con más información (por ejemplo, los envios / su posterior judgement) 
+u otras causas.
+
+1 / baja: son bajas, como todos los judgement. Sería más interesante si ese judgement 
+desencadena por ejemplo un cambio en el scoreboard.
+
+2/ media: son más interesantes que los bajos pero es posible que a otros pv no les interesa.
+
+3 / alta: podrían llegar a interesar a todos aunque no sigas a ese pv en particular.
+los cambios del scoreboard general
+primer en resolver problema
+le esta costando Y TIENE MUCHOS AC
+
+4 /maxima: maxima prioridad, son interesantes SI O SI, aunque no estes enterado de un concurso de programacion y por ej solo te interese un equipo.
+
+*/
 enum priority { 
     minima  ,
     baja ,
@@ -10,9 +28,16 @@ enum priority {
 }
 
 enum eventtype {
-    //problems
+    //problems 
+    sent = 'sent',
+    judgement = 'judgement',
     accepted_answer = 'accepted_answer',
+    problem_first_ac = 'first_ac',
+    all_ac = 'all_ac',
+    hard_to_solve = 'hard_to_solve',
+    hard_to_solve_high_ac_ratio = 'hard_to_solve_high_ac_ratio',
     not_accepted_answer     = 'not_accepted_answer',
+    not_solved_long_ago = 'not_solved_long_ago',
 
     //teams actions
 
