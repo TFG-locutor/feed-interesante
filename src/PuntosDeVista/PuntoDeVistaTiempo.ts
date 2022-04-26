@@ -37,33 +37,33 @@ class PuntoDeVistaTiempo extends PuntoDeVista {
                     case CambioEstado.MarcadorCongelado:
                         if(forward) {
                             var eventoSalida = new EventoSalida("Se ha congelado el marcador",
-                        EventoSalida.priority.maxima,[],{},evCE.moment.format(),EventoSalida.eventtype.accepted_answer);
+                        EventoSalida.priority.maxima,["time"],{},evCE.moment.format(),EventoSalida.eventtype.contest_freeze);
                             this.emitir(eventoSalida);
                         } else {
                             var eventoSalida = new EventoSalida("Se ha descongelado el marcador",
-                        EventoSalida.priority.maxima,[],{},evCE.moment.format(),EventoSalida.eventtype.accepted_answer);
+                        EventoSalida.priority.maxima,["time"],{},evCE.moment.format(),EventoSalida.eventtype.contest_unfreeze);
                             this.emitir(eventoSalida);
                         }
                         break;
                     case CambioEstado.ConcursoIniciado:
                         if(forward) {
                             var eventoSalida = new EventoSalida("Ha empezado el concurso",
-                        EventoSalida.priority.maxima,[],{},evCE.moment.format(),EventoSalida.eventtype.accepted_answer);
+                        EventoSalida.priority.maxima,["time"],{},evCE.moment.format(),EventoSalida.eventtype.contest_start);
                             this.emitir(eventoSalida);
                         } else {
                             var eventoSalida = new EventoSalida("El concurso aún no ha empezado",
-                        EventoSalida.priority.maxima,[],{},evCE.moment.format(),EventoSalida.eventtype.accepted_answer);
+                        EventoSalida.priority.maxima,["time"],{},evCE.moment.format(),EventoSalida.eventtype.contest_not_started);
                             this.emitir(eventoSalida);
                         }
                         break;
                     case CambioEstado.ConcursoFinalizado:
                         if(forward) {
                             var eventoSalida = new EventoSalida("Ha terminado el concurso",
-                        EventoSalida.priority.maxima,[],{},evCE.moment.format(),EventoSalida.eventtype.accepted_answer);
+                        EventoSalida.priority.maxima,["time"],{},evCE.moment.format(),EventoSalida.eventtype.contest_end);
                             this.emitir(eventoSalida);
                         } else {
                             var eventoSalida = new EventoSalida("El concurso aún no ha terminado",
-                        EventoSalida.priority.maxima,[],{},evCE.moment.format(),EventoSalida.eventtype.accepted_answer);
+                        EventoSalida.priority.maxima,["time"],{},evCE.moment.format(),EventoSalida.eventtype.contest_not_ended);
                             this.emitir(eventoSalida);
                         }
                         break;

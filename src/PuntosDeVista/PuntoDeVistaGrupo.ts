@@ -102,7 +102,7 @@ class PuntoDeVistaGrupo extends PuntoDeVista{
 
                 if(pastRanking!=tData.ranking_pos) {
                     var eventoSalida = new EventoSalida("El equipo "+evVer.equipo+" ("+evVer.id_equipo+") ha pasado de la posición "+pastRanking+" a la posición "+tData.ranking_pos+" dentro del grupo "+this.nombre_grupo+" ("+this.id_grupo+")"+" después de recibir un "+evVer.resultado+" en el problema "+evVer.problema+" ("+evVer.id_problema+")",
-                        EventoSalida.priority.media,[],{},evVer.moment.format(),EventoSalida.eventtype.accepted_answer);
+                        EventoSalida.priority.media,[this.nombre_grupo, evVer.equipo, evVer.resultado/* , evVer.problema */, "scoreboard_group"],{},evVer.moment.format(),EventoSalida.eventtype.group_scoreboard_change);
                     this.emitir(eventoSalida);
                 }
 

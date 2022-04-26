@@ -62,7 +62,7 @@ class PuntoDeVistaEquipo extends PuntoDeVista{
                     if(this.nProblemasResueltos>=this.minProblemasResueltosParaComparar&&!this.msgNumAltoProblemasALaPrimera&&this.nProblemasResueltosALaPrimera/this.nProblemasResueltos>=this.proporcionProblemasResueltosALaPrimeraParaQueSeaInteresante) {
                         this.msgNumAltoProblemasALaPrimera = true;
                         var eventoSalida = new EventoSalida("El equipo "+this.nombre_equipo+" ("+this.id_equipo+") ha resuelto muchos problemas al primer intento!",
-                        EventoSalida.priority.maxima,[],{},evVer.moment.format(),EventoSalida.eventtype.accepted_answer);
+                        EventoSalida.priority.alta,[],{},evVer.moment.format(),EventoSalida.eventtype.accepted_answer);
                         //this.emitir(evVer.moment.format()+": El equipo "+this.nombre_equipo+" ("+this.id_equipo+") ha resuelto muchos problemas al primer intento!");
                         this.emitir(eventoSalida);
                     }

@@ -97,7 +97,7 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
 
                 if(pastRanking!=tData.ranking_pos) {
                     var eventoSalida = new EventoSalida("El equipo "+evVer.equipo+" ("+evVer.id_equipo+") ha pasado de la posición "+pastRanking+" a la posición "+tData.ranking_pos+" después de recibir un "+evVer.resultado+" en el problema "+evVer.problema+" ("+evVer.id_problema+")",
-                        EventoSalida.priority.media,[],{},evVer.moment.format(),EventoSalida.eventtype.accepted_answer);
+                        EventoSalida.priority.alta,[evVer.equipo, evVer.resultado/* , evVer.problema */, "scoreboard_general"],{},evVer.moment.format(),EventoSalida.eventtype.general_scoreboard_change);
                     this.emitir(eventoSalida);
                 }
                 //console.log(this.teams);
