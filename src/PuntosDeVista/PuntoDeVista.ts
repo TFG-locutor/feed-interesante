@@ -33,13 +33,17 @@ enum eventtype {
     judgement = 'judgement',
     accepted_answer = 'accepted_answer',
     problem_first_ac = 'first_ac',
-    all_ac = 'all_ac',
+    problem_all_ac = 'all_ac',
     hard_to_solve = 'hard_to_solve',
     hard_to_solve_high_ac_ratio = 'hard_to_solve_high_ac_ratio',
     not_accepted_answer     = 'not_accepted_answer',
     not_solved_long_ago = 'not_solved_long_ago',
 
     //teams actions
+
+    team_first_ac = 'team_first_ac',
+    team_all_ac = 'team_all_ac',
+    team_multiple_firsttry_ac = 'team_multiple_firsttry_ac',
 
     //scoreboard
     general_scoreboard_change = 'general_scoreboard_change',

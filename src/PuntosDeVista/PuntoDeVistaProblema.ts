@@ -79,7 +79,7 @@ class PuntoDeVistaProblema extends PuntoDeVista{
                     }
                     if(this.nVecesResuelto==this.nEquipos) {
                         var eventoSalida = new EventoSalida("El problema "+this.nombre_problema+" ("+this.id_problema+") ha sido resuelto por todos los equipos!",
-                        EventoSalida.priority.maxima,[this.nombre_problema,  "judgement"],{},evVer.moment.format(),EventoSalida.eventtype.all_ac);
+                        EventoSalida.priority.maxima,[this.nombre_problema,  "judgement"],{},evVer.moment.format(),EventoSalida.eventtype.problem_all_ac);
                         this.emitir(eventoSalida);
 
                     }
