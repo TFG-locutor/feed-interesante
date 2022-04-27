@@ -37,6 +37,11 @@ class EventFactory {
 
     //Asocia un id a los datos de un problema
     _problemas: Map<string,TProblemData>;
+    public getDatosProblema(id: string) : TProblemData | null {
+        var problema = this._equipos.get(id);
+        if(problema==undefined) return null;
+        return problema;
+    }
     private getProblemName(id: string) : string {
         var problema = this._problemas.get(id);
         if(problema==undefined || problema.nombre == undefined) return "unknown problem name";
@@ -45,6 +50,11 @@ class EventFactory {
 
     //Asocia un id a los datos de un equipo
     _equipos: Map<string,TEquipoData>;
+    public getDatosEquipo(id: string) : TEquipoData | null {
+        var equipo = this._equipos.get(id);
+        if(equipo==undefined) return null;
+        return equipo;
+    }
     private getTeamName(id: string) : string {
         var equipo = this._equipos.get(id);
         if(equipo==undefined || equipo.nombre==undefined) return "unknown team name";
@@ -52,6 +62,11 @@ class EventFactory {
     }
 
     _grupos: Map<string,TGrupoData>;
+    public getDatosGrupo(id: string) : TGrupoData | null {
+        var grupo = this._grupos.get(id);
+        if(grupo==undefined) return null;
+        return grupo;
+    }
     private getGroupName(id: string) : string {
         var grupo = this._grupos.get(id);
         if(grupo==undefined ||grupo.nombre==undefined) return "unknown group name";
@@ -59,6 +74,11 @@ class EventFactory {
     }
 
     _organizaciones: Map<string,TOrganizacionData>;
+    public getDatosOrganizacion(id: string) : TOrganizacionData | null {
+        var organizacion = this._organizaciones.get(id);
+        if(organizacion==undefined) return null;
+        return organizacion;
+    }
 
     //Marcadores para los cambios de estado del concurso
     

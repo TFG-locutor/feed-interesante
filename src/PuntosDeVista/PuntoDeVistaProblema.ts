@@ -62,6 +62,7 @@ class PuntoDeVistaProblema extends PuntoDeVista{
                 break;
             case "veredicto":
                 var evVer = evento as EventoVeredicto;
+                console.log(evVer);
                 var eventoSalida = new EventoSalida("El resultado del envío "+evVer.id_envio+" ha sido "+evVer.resultado+ ", lleva "+evVer.n_intento+" intentos",
                         EventoSalida.priority.baja,[this.nombre_problema, evVer.equipo, evVer.resultado, "judgement"],{},evVer.moment.format(),EventoSalida.eventtype.judgement);
 

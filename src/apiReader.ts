@@ -5,6 +5,7 @@ import moment from "moment";
 import { Observable, Subject } from "rxjs";
 import { Configuration } from "./config";
 import { EventoBump } from "./Eventos/Custom/EventoBump";
+import { EventoFinRecap } from "./Eventos/Custom/EventoFinRecap";
 import { EventFactory } from "./Eventos/EventFactory";
 import { Evento } from "./Eventos/Evento";
 
@@ -62,10 +63,25 @@ class APIReader {
                 let numParentesis : number = 0; //Número de paréntesis abiertos
                 let insideComillas : boolean = false;
                 let anteriorIgualAEscape : boolean = false;
+
+                let lastDataMoment : moment.Moment | null = null;
+                let endOfRecap = false;
                 res.on('data', (chunk : any) => {
 
                     //suscriber.next(new EventoBump("null"));
 
+                    if(!endOfRecap) {
+                        var now : moment.Moment = moment();
+                        if(lastDataMoment!=null) {
+                            //Peligro
+                            //Se está asumiendo qué si no se reciben datos en un periodo de 1seg, se ha terminado el recap inicial del event-feed
+                            if(now.diff(lastDataMoment, "second") > 1) {
+                                endOfRecap = true;
+                                eventEmiter.next( new EventoFinRecap(now.format()) );
+                            }
+                        }
+                        lastDataMoment = now;
+                    }
                     if((/^\n$/).test(chunk)) {
                         console.log("...");
                         return;
@@ -121,6 +137,13 @@ class APIReader {
                     eventEmiter.complete();
                 });
                 setInterval(() => {
+                    if(!endOfRecap) {
+                        var now = moment();
+                        if(lastDataMoment!=null && now.diff(lastDataMoment, "second") > 1) {
+                            endOfRecap = true;
+                            eventEmiter.next( new EventoFinRecap(now.format()) );
+                        }
+                    }
                     var bumpSecondaryEvents = EventFactory.ProcesarYEnriquecerEvento(new EventoBump(moment().format()));
                     for(var bumpSecondaryEvent of bumpSecondaryEvents) eventEmiter.next(bumpSecondaryEvent);
                 }, 1000);
