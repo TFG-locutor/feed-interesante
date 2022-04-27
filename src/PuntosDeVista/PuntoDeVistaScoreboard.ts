@@ -156,11 +156,11 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
 
                     var oldEntryProblema = that.datosEquipo.get(row.team_id)?.problems.get(problem.problem_id);
 
-                    if(cambioEquipo!=null) {
+                    if(cambioEquipo==null) {
                         //Se comprueban en cascada todos los cambios que ha podido tener un problema
                         if(problem.solved) {
                             cambioEquipo = "resolver el problema "+problemData.nombre+""
-                            if(!oldEntryProblema || oldEntryProblema.num_judged==1) cambioEquipo = " a la primera"
+                            if(!oldEntryProblema || oldEntryProblema.num_judged==1) cambioEquipo += " a la primera"
                         }
                         if(!oldEntryProblema) {
                             //Se ha intentado un problema que no tenía una entrada antes
@@ -176,10 +176,10 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
 
                 var oldEntryEquipo = that.datosEquipo.get(row.team_id);
                 if(oldEntryEquipo && row.rank < oldEntryEquipo.rank) {
-                    //TODO: poner esto bien en vez de una frase
-                    console.log/*that.emitir*/(
-                        "El equipo "+teamData.nombre+" ha pasado del puesto "+oldEntryEquipo.rank+" al puesto "+row.rank+" después de "+cambioEquipo
-                    );
+
+                    var eventoSalida = new EventoSalida("El equipo "+teamData.nombre+" ha pasado de la posición "+oldEntryEquipo.rank+" a la posición "+row.rank+" después de "+cambioEquipo,
+                    EventoSalida.priority.alta,[teamData.nombre, "AC", "scoreboard_general"],{},moment().format(),EventoSalida.eventtype.general_scoreboard_change);
+                    this.emitir(eventoSalida);
                 }
                 
             }
