@@ -64,7 +64,7 @@ class PuntoDeVistaProblema extends PuntoDeVista{
                 var evVer = evento as EventoVeredicto;
                 console.log(evVer);
                 var eventoSalida = new EventoSalida("El resultado del envío "+evVer.id_envio+" ha sido "+evVer.resultado+ ", lleva "+evVer.n_intento+" intentos",
-                        EventoSalida.priority.baja,[this.nombre_problema, evVer.equipo, evVer.resultado, "judgement"],{},evVer.moment.format(),EventoSalida.eventtype.judgement);
+                        EventoSalida.priority.baja,[this.nombre_problema, evVer.equipo, evVer.resultado, evVer.id_organizacion, "judgement"],{},evVer.moment.format(),EventoSalida.eventtype.judgement);
 
                 this.emitir(eventoSalida);
 
@@ -75,7 +75,7 @@ class PuntoDeVistaProblema extends PuntoDeVista{
                     if(!this.ha_sido_resuelto) {
                         this.ha_sido_resuelto = true;
                         var eventoSalida = new EventoSalida("El equipo "+evVer.equipo+" ("+evVer.id_equipo+") ha sido el primero en resolver el problema '"+evVer.problema+"' ("+this.id_problema+") - ["+evVer.n_intento+" intento/s]",
-                        EventoSalida.priority.alta,[this.nombre_problema, evVer.equipo, evVer.resultado, "judgement"],{},evVer.moment.format(),EventoSalida.eventtype.problem_first_ac);
+                        EventoSalida.priority.alta,[this.nombre_problema, evVer.equipo, evVer.resultado, evVer.id_organizacion,"judgement"],{},evVer.moment.format(),EventoSalida.eventtype.problem_first_ac);
                         this.emitir(eventoSalida);
                     }
                     if(this.nVecesResuelto==this.nEquipos) {
@@ -88,13 +88,13 @@ class PuntoDeVistaProblema extends PuntoDeVista{
                     if(!this.msgCuestaResulverUnProblema.has(evVer.id_envio)&&evVer.n_intento>=this.nIntentosParaConsiderarQueTeCuesta) {
                         this.msgCuestaResulverUnProblema.add(evVer.id_envio);
                         var eventoSalida = new EventoSalida("Al equipo '"+evVer.equipo+"' ("+evVer.id_equipo+") le está costando resolver el problema "+this.nombre_problema+" ("+this.id_problema+")",
-                        EventoSalida.priority.media,[this.nombre_problema, evVer.equipo, evVer.resultado, "judgement"],{},evVer.moment.format(),EventoSalida.eventtype.hard_to_solve);
+                        EventoSalida.priority.media,[this.nombre_problema, evVer.equipo, evVer.resultado,evVer.id_organizacion, "judgement"],{},evVer.moment.format(),EventoSalida.eventtype.hard_to_solve);
                         this.emitir(eventoSalida);
                     }
                     if(!this.msgCuestaResulverUnProblemaMuyResuelto.has(evVer.id_envio)&&evVer.n_intento>=this.nIntentosParaConsiderarQueTeCuestaAlgoResuelto&&(this.nVecesResuelto/this.nEquipos)>this.proporcionVecesResueltoParaConsiderarAlgoFacil) {
                         this.msgCuestaResulverUnProblemaMuyResuelto.add(evVer.id_envio);
                         var eventoSalida = new EventoSalida("Al equipo '"+evVer.equipo+"' ("+evVer.id_equipo+") le está costando resolver el problema "+this.nombre_problema+" ("+this.id_problema+"), que tiene ya bastantes envios correctos",
-                        EventoSalida.priority.alta,[this.nombre_problema, evVer.equipo, evVer.resultado, "judgement"],{},evVer.moment.format(),EventoSalida.eventtype.hard_to_solve_high_ac_ratio);
+                        EventoSalida.priority.alta,[this.nombre_problema, evVer.equipo, evVer.resultado,evVer.id_organizacion, "judgement"],{},evVer.moment.format(),EventoSalida.eventtype.hard_to_solve_high_ac_ratio);
                         this.emitir(eventoSalida);
                     }
                 }
