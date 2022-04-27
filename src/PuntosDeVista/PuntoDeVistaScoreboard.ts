@@ -211,8 +211,8 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
                 var cambioEquipo : String | null = null;
                 var cambioEquipoOrg : String | null = null;
 
-                var entryDataNewOrg = nuevosDatosEquipoOrganizacion.get(org)?.get(row.team_id);
-                var entryDataOldOrg = that.datosEquipoOrganizacion.get(org)?.get(row.team_id);
+                var entryDataNewOrg = nuevosDatosEquipoOrganizacion.get(teamData.organizacion)?.get(row.team_id);
+                var entryDataOldOrg = that.datosEquipoOrganizacion.get(teamData.organizacion)?.get(row.team_id);
 
                 for(var problem of row.problems) {
                     //problem.problem_id;
@@ -256,7 +256,7 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
                     if(cambioEquipoOrg==null) {
                         if(entryDataProblemaNewOrg?.solved && (!entryDataProblemaOldOrg || !entryDataProblemaOldOrg?.solved) ) {
                             cambioEquipoOrg = "resolver el problema "+problemData.nombre+"";
-                            if(!entryDataProblemaOldOrg || entryDataProblemaNewOrg.num_judged==1) cambioEquipo += " a la primera";
+                            if(!entryDataProblemaOldOrg || entryDataProblemaNewOrg.num_judged==1) cambioEquipoOrg += " a la primera";
                         }
                     }
                     
@@ -275,8 +275,9 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
                 //Calcular diferencias entre un equipo y el mismo (dentro de una organización)
                 if(entryDataOldOrg && entryDataNewOrg && entryDataOldOrg.rank > entryDataNewOrg.rank) {
 
-                    var eventoSalida = new EventoSalida("El equipo "+teamData.nombre+" ha pasado de la posición "+entryDataOldOrg.rank+" a la posición "+entryDataNewOrg+" dentro de la organización "+orgData.nombre+" después de "+cambioEquipo,
+                    var eventoSalida = new EventoSalida("El equipo "+teamData.nombre+" ha pasado de la posición "+entryDataOldOrg.rank+" a la posición "+entryDataNewOrg+" dentro de la organización "+orgData.nombre+" después de "+cambioEquipoOrg,
                     EventoSalida.priority.alta,[teamData.nombre, orgData.id, "AC", "scoreboard_organizacion"],{},moment().format(),EventoSalida.eventtype.organization_scoreboard_change);
+                    that.emitir(eventoSalida);
 
                 }
                 

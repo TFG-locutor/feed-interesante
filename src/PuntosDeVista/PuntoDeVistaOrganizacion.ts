@@ -100,11 +100,11 @@ class PuntoDeVistaOrganizacion extends PuntoDeVista{
 
                 //TODO: refactorizar esto
 
-                if(pastRanking!=tData.ranking_pos) {
+                /* if(pastRanking!=tData.ranking_pos) {
                     var eventoSalida = new EventoSalida("El equipo "+evVer.equipo+" ha pasado de la posición "+pastRanking+" a la posición "+tData.ranking_pos+" dentro de la organización "+this.nombre_organizacion+" después de recibir un "+evVer.resultado+" en el problema "+evVer.problema,
                         EventoSalida.priority.media,[this.nombre_organizacion, evVer.equipo, evVer.resultado, evVer.id_organizacion, "scoreboard_organization"],{},evVer.moment.format(),EventoSalida.eventtype.organization_scoreboard_change);
-                    this.emitir(eventoSalida);
-                }
+                    //this.emitir(eventoSalida);
+                } */
 
                 break;
             case "contest":
