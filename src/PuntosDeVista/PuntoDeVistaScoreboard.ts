@@ -109,7 +109,7 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
     private scoreboard : Tscoreboard | null;
     //asocia un id de un equipo a los datos de ese equipo desde la útlima vez, para camparar
     private datosEquipo : Map<string,TTeamSBData>;
-    //private datosEquipoOrganizacion : Map<String, Map<string, TTeamSBData>>;
+    private datosEquipoOrganizacion : Map<String, Map<string, TTeamSBData>>;
 
     private penalty_time : number;
     private congelado : boolean;
