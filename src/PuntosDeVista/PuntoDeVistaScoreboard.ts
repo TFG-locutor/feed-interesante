@@ -112,6 +112,7 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
     private datosEquipoOrganizacion : Map<String, Map<string, TTeamSBData>>;
 
     private penalty_time : number;
+    private start_moment : moment.Moment | null;
     private congelado : boolean;
     private fin_recap : boolean;
 
@@ -303,6 +304,7 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
         super( eventFeed );
         this.scoreboard = null;
         this.penalty_time = 0;
+        this.start_moment = null;
         this.congelado = false;
         this.fin_recap = false;
         /*
@@ -314,6 +316,51 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
         this.datosEquipo = new Map<string,TTeamSBData>();
         this.datosEquipoOrganizacion = new Map<String, Map<string, TTeamSBData>>();
         console.log("creado el punto de vista del scoreboard")
+    }
+
+    last_comparacion_primeros : moment.Moment | null = null;
+    
+    comparar_primeros() {
+        try{
+            if(this.start_moment==null) return;
+            var now = moment();
+            if(this.last_comparacion_primeros==null) this.last_comparacion_primeros = this.start_moment;
+            if(now.diff(this.last_comparacion_primeros, "minutes")>30) {
+
+                //Comparar los primeros puestos
+                if(this.scoreboard!=null && this.scoreboard.rows.length>2 && this.scoreboard.rows.at(0) && this.scoreboard.rows.at(1)) {
+                    var pri = this.scoreboard.rows.at(0);
+                    var seg = this.scoreboard.rows.at(1);
+                    if(!pri || !seg) return;
+                    var ef = EventFactory.getInstance();
+                    var dat_pri = ef.getDatosEquipo(pri.team_id);
+                    var dat_seg = ef.getDatosEquipo(seg.team_id);
+                    if(!dat_pri || !dat_seg) return;
+                    if(seg.score.num_solved==0) return; //no hay chicha
+                    var evento : EventoSalida;
+                    if(pri.score.num_solved == seg.score.num_solved) {
+                        evento = new EventoSalida(
+                            "¡Los equipos "+dat_pri.nombre+" y "+dat_seg.nombre+" van empatados a "+pri.score.num_solved+" problemas en lo alto del podio!",
+                            EventoSalida.priority.maxima,
+                            [dat_pri.nombre, dat_pri.nombre, dat_pri.organizacion, dat_seg.organizacion], {}, now.format(),
+                            EventoSalida.eventtype.scoreboard_close_first_and_second
+                        );
+                        this.emitir(evento);
+                        this.last_comparacion_primeros = now;
+                    } else if( pri.score.num_solved - seg.score.num_solved >= 2 ) {
+                        evento = new EventoSalida(
+                            "El equipo "+dat_pri.nombre+" en primera posición le saca una ventaja de "+(pri.score.num_solved - seg.score.num_solved)+" problemas al equipo "+dat_seg.nombre+", en segunda posición...",
+                            EventoSalida.priority.alta,
+                            [dat_pri.nombre, dat_pri.nombre, dat_pri.organizacion, dat_seg.organizacion], {}, now.format(),
+                            EventoSalida.eventtype.scoreboard_uncontested_first_and_second
+                        );
+                        this.emitir(evento);
+                        this.last_comparacion_primeros = now;
+                    }
+                }
+
+            }
+        } catch(e) {}
     }
 
     filtrar(evento: Evento): boolean {
@@ -338,9 +385,10 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
                 this.fin_recap = true;
                 break;
             case "envio":
-                if(this.fin_recap && this.congelado) {
-                    this.pedir_scoreboard(this.procesarScoreboard, this);
-                }
+                //if(this.fin_recap && this.congelado) {
+                    //this.pedir_scoreboard(this.procesarScoreboard, this);
+                //}
+                this.comparar_primeros();
                 break;
             case "veredicto":
                 if(this.fin_recap) {
@@ -350,7 +398,7 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
             case "contest":
                 var evCon = evento as ContestEvent;
                 this.penalty_time = evCon.penalty_time;
-                //this.start_moment = evCon.start_time;
+                this.start_moment = evCon.start_time;
                 break;
             case "cambio_estado":
                 var evCE = evento as EventoCambioEstado;

@@ -49,6 +49,8 @@ enum eventtype {
     general_scoreboard_change = 'general_scoreboard_change',
     organization_scoreboard_change = 'organization_scoreboard_change',
     group_scoreboard_change = 'group_scoreboard_change',
+    scoreboard_close_first_and_second = 'scoreboard_close_first_and_second',
+    scoreboard_uncontested_first_and_second = 'scoreboard_uncontested_first_and_second',
     
     //time
     contest_start = 'contest_start',
