@@ -1,13 +1,13 @@
 
 import { IncomingMessage } from "http";
 import moment, { Moment } from "moment";
-import { Observable } from "rxjs";
+import { map, Observable } from "rxjs";
 import { ConfigurationLoader } from "../config";
 import { ContestEvent } from "../Eventos/ContestEvent";
 import { EventoVeredicto } from "../Eventos/Custom/EventoVeredicto";
 import { EventFactory } from "../Eventos/EventFactory";
 import { Evento } from "../Eventos/Evento";
-import { TEquipoData, TProblemData } from "../InternalDataTypes";
+import { TEquipoData, TOrganizacionData, TProblemData } from "../InternalDataTypes";
 import { EventoSalida, PuntoDeVista } from "./PuntoDeVista";
 import { CambioEstado, TipoCambioEstado, EventoCambioEstado } from "../Eventos/Custom/EventoCambioEstado"
 
@@ -119,8 +119,76 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
 
         var ef : EventFactory = EventFactory.getInstance();
 
+        //Primero se preprocesa todo para poder construir los SV pequeños y una estructura que asignar directamente a las variables antiguas
+
+        var nuevosDatosEquipo = new Map<string, TTeamSBData>();
+        var nuevosDatosEquipoOrganizacion = new Map<string, Map<string, TTeamSBData>>();
+        for(var row of sb.rows) {
+            var problems = new Map<string,{
+                num_judged: number;
+                num_pending: number;
+                solved: boolean;
+                time: number | null;
+                first_to_solve: boolean | null;
+            }>();
+            for(var problem of row.problems) {
+                problems.set(problem.problem_id, {
+                    num_judged: problem.num_judged,
+                    num_pending: problem.num_pending,
+                    solved: problem.solved,
+                    time: problem.time ? problem.time : null,
+                    first_to_solve: problem.first_to_solve ? problem.first_to_solve : null
+                });
+            }
+            nuevosDatosEquipo.set(row.team_id, {
+                score: row.score,
+                rank: row.rank,
+                problems: problems
+            });
+            var teamData : TEquipoData | null = ef.getDatosEquipo(row.team_id);
+                if(teamData==null) { teamData = {
+                    nombre: "unknown team name",
+                    grupos: [""],
+                    organizacion: ""
+                }; console.log("Error interno, no hay datos asociados al equipo con id '"+row.team_id+"'");}
+            var orgData : TOrganizacionData | null = ef.getDatosOrganizacion(teamData.organizacion);
+            //console.log(orgData);
+            if(orgData) {
+                var entryDatosEquipoOrg = nuevosDatosEquipoOrganizacion.get(orgData.id);
+                if(!entryDatosEquipoOrg) nuevosDatosEquipoOrganizacion.set(orgData.id, entryDatosEquipoOrg = new Map<string, TTeamSBData>())
+                entryDatosEquipoOrg.set(row.team_id, {
+                    score: row.score,
+                    rank: row.rank,
+                    problems: problems
+                });
+            }
+        }
+        //Actualizar los sub-scoreboards de las organizaciones
+        //TODO: quitar console.logs cuando se verifique 
+        //console.log("Scoreboard de las organizaciones");
+        for(var [org, subSB] of nuevosDatosEquipoOrganizacion.entries() ) {
+            var rank = 1;
+            var processed = 0;
+            var lastScore = 0;
+            var lastTime = 0;
+            //console.log("  Scoreboard de la organización "+org);
+            for(var [teamId, subSBTeamData] of subSB) {
+                ++processed;
+                if(subSBTeamData.score.num_solved<lastScore || (subSBTeamData.score.num_solved==lastScore && subSBTeamData.score.total_time > lastTime) )
+                    rank = processed;
+                subSBTeamData.rank = rank;
+
+                lastScore = subSBTeamData.score.num_solved;
+                lastTime = subSBTeamData.score.total_time;
+
+                //console.log("    "+teamId+": rango "+subSBTeamData.rank+" con "+subSBTeamData.score.num_solved+" resueltos y un tiempo de "+subSBTeamData.score.total_time);
+            }
+        }
+
         if(that.scoreboard != null) {
             
+            //Luego se compara (si no es la primera vez que se llama)
+
             for(var row of sb.rows) {
                 //row.team_id;
                 //row.rank;
@@ -133,8 +201,18 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
                     organizacion: ""
                 }; console.log("Error interno, no hay datos asociados al equipo con id '"+row.team_id+"'");}
 
+                var orgData : TOrganizacionData | null = ef.getDatosOrganizacion(row.team_id);
+                if(orgData==null) { orgData = {
+                    id: "-1",
+                    nombre: "unknown team name"
+                }; console.log("Error interno, no hay datos asociados al la organización con id '"+orgData+"'");}
+
                 //que cambios ha tenido un equipo desde la última comprobación
                 var cambioEquipo : String | null = null;
+                var cambioEquipoOrg : String | null = null;
+
+                var entryDataNewOrg = nuevosDatosEquipoOrganizacion.get(org)?.get(row.team_id);
+                var entryDataOldOrg = that.datosEquipoOrganizacion.get(org)?.get(row.team_id);
 
                 for(var problem of row.problems) {
                     //problem.problem_id;
@@ -161,7 +239,7 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
                         //Se comprueban en cascada todos los cambios que ha podido tener un problema
                         if(problem.solved && (!oldEntryProblema || !oldEntryProblema.solved)) {
                             cambioEquipo = "resolver el problema "+problemData.nombre+""
-                            if(!oldEntryProblema || oldEntryProblema.num_judged==1) cambioEquipo += " a la primera"
+                            if(!oldEntryProblema || problem.num_judged==1) cambioEquipo += " a la primera"
                         }
                         if(!oldEntryProblema) {
                             //Se ha intentado un problema que no tenía una entrada antes
@@ -171,6 +249,17 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
                         }
                         
                     }
+
+                    var entryDataProblemaNewOrg = entryDataNewOrg?.problems.get(problem.problem_id);
+                    var entryDataProblemaOldOrg = entryDataOldOrg?.problems.get(problem.problem_id);
+
+                    if(cambioEquipoOrg==null) {
+                        if(entryDataProblemaNewOrg?.solved && (!entryDataProblemaOldOrg || !entryDataProblemaOldOrg?.solved) ) {
+                            cambioEquipoOrg = "resolver el problema "+problemData.nombre+"";
+                            if(!entryDataProblemaOldOrg || entryDataProblemaNewOrg.num_judged==1) cambioEquipo += " a la primera";
+                        }
+                    }
+                    
                 }
 
                 //Calcular diferencias entre un equipo y el mismo
@@ -179,8 +268,16 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
                 if(oldEntryEquipo && row.rank < oldEntryEquipo.rank) {
 
                     var eventoSalida = new EventoSalida("El equipo "+teamData.nombre+" ha pasado de la posición "+oldEntryEquipo.rank+" a la posición "+row.rank+" después de "+cambioEquipo,
-                    EventoSalida.priority.alta,[teamData.nombre, "AC", "scoreboard_general"],{},moment().format(),EventoSalida.eventtype.general_scoreboard_change);
+                    EventoSalida.priority.alta,[teamData.nombre, orgData.id, "AC", "scoreboard_general"],{},moment().format(),EventoSalida.eventtype.general_scoreboard_change);
                     that.emitir(eventoSalida);
+                }
+
+                //Calcular diferencias entre un equipo y el mismo (dentro de una organización)
+                if(entryDataOldOrg && entryDataNewOrg && entryDataOldOrg.rank > entryDataNewOrg.rank) {
+
+                    var eventoSalida = new EventoSalida("El equipo "+teamData.nombre+" ha pasado de la posición "+entryDataOldOrg.rank+" a la posición "+entryDataNewOrg+" dentro de la organización "+orgData.nombre+" después de "+cambioEquipo,
+                    EventoSalida.priority.alta,[teamData.nombre, orgData.id, "AC", "scoreboard_organizacion"],{},moment().format(),EventoSalida.eventtype.organization_scoreboard_change);
+
                 }
                 
             }
@@ -189,29 +286,8 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
         
         //Actualizar la información para la próxima vez que se llame aquí
         that.scoreboard = sb;
-        for(var row of sb.rows) {
-            var problems = new Map<string,{
-                num_judged: number;
-                num_pending: number;
-                solved: boolean;
-                time: number | null;
-                first_to_solve: boolean | null;
-            }>();
-            for(var problem of row.problems) {
-                problems.set(problem.problem_id, {
-                    num_judged: problem.num_judged,
-                    num_pending: problem.num_pending,
-                    solved: problem.solved,
-                    time: problem.time ? problem.time : null,
-                    first_to_solve: problem.first_to_solve ? problem.first_to_solve : null
-                });
-            }
-            that.datosEquipo.set(row.team_id, {
-                score: row.score,
-                rank: row.rank,
-                problems: problems
-            });
-        }
+        that.datosEquipo = nuevosDatosEquipo;
+        that.datosEquipoOrganizacion = nuevosDatosEquipoOrganizacion;
 
     }
 
@@ -235,6 +311,7 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
         this.start_moment = moment();
         */
         this.datosEquipo = new Map<string,TTeamSBData>();
+        this.datosEquipoOrganizacion = new Map<String, Map<string, TTeamSBData>>();
         console.log("creado el punto de vista del scoreboard")
     }
 
