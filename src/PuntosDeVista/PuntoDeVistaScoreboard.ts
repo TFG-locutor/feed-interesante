@@ -109,6 +109,7 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
     private scoreboard : Tscoreboard | null;
     //asocia un id de un equipo a los datos de ese equipo desde la útlima vez, para camparar
     private datosEquipo : Map<string,TTeamSBData>;
+    private datosEquipoOrganizacion : Map<String, Map<string, TTeamSBData>>;
 
     private penalty_time : number;
     private congelado : boolean;
@@ -158,7 +159,7 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
 
                     if(cambioEquipo==null) {
                         //Se comprueban en cascada todos los cambios que ha podido tener un problema
-                        if(problem.solved) {
+                        if(problem.solved && (!oldEntryProblema || !oldEntryProblema.solved)) {
                             cambioEquipo = "resolver el problema "+problemData.nombre+""
                             if(!oldEntryProblema || oldEntryProblema.num_judged==1) cambioEquipo += " a la primera"
                         }
@@ -179,7 +180,7 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
 
                     var eventoSalida = new EventoSalida("El equipo "+teamData.nombre+" ha pasado de la posición "+oldEntryEquipo.rank+" a la posición "+row.rank+" después de "+cambioEquipo,
                     EventoSalida.priority.alta,[teamData.nombre, "AC", "scoreboard_general"],{},moment().format(),EventoSalida.eventtype.general_scoreboard_change);
-                    this.emitir(eventoSalida);
+                    that.emitir(eventoSalida);
                 }
                 
             }
