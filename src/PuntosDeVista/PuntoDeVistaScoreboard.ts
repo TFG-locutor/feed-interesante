@@ -179,7 +179,7 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
                 if(oldEntryEquipo && row.rank < oldEntryEquipo.rank) {
 
                     var eventoSalida = new EventoSalida("El equipo "+teamData.nombre+" ha pasado de la posición "+oldEntryEquipo.rank+" a la posición "+row.rank+" después de "+cambioEquipo,
-                    EventoSalida.priority.alta,[teamData.nombre, "AC", "scoreboard_general"],{},moment().format(),EventoSalida.eventtype.general_scoreboard_change);
+                    EventoSalida.priority.alta,[teamData.nombre, teamData.organizacion, "AC", "scoreboard_general"],{},moment().format(),EventoSalida.eventtype.general_scoreboard_change);
                     that.emitir(eventoSalida);
                 }
                 
