@@ -33,17 +33,10 @@ class tweetEvent extends EventHandler{
 	}
     procesar(evento: EventoSalida): void {
         //console.log("tweetEvent");
-		if(evento.gettags().some(tag => this.interested_in_tags.includes(tag))) {
-			if(evento.getprioridad() >= this.minimum_priority_interestedin_events) {
-				this.tweet(evento.getmessage());
-			}
+		if(evento.gettags().some(tag => this.interested_in_tags.includes(tag) && evento.getprioridad() >= this.minimum_priority_interestedin_events ||
+		evento.getprioridad() >= this.minimum_priority_all_events)){
+			this.tweet(evento.getmessage());
 		}
-		else{
-			if(evento.getprioridad() >= this.minimum_priority_all_events){
-				this.tweet(evento.getmessage());
-			}
-		}
-		
 	}
 }
 
