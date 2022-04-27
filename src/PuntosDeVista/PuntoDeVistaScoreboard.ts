@@ -121,9 +121,9 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
         if(that.scoreboard != null) {
             
             for(var row of sb.rows) {
-                row.team_id;
-                row.rank;
-                row.score;
+                //row.team_id;
+                //row.rank;
+                //row.score;
 
                 var teamData : TEquipoData | null = ef.getDatosEquipo(row.team_id);
                 if(teamData==null) { teamData = {
@@ -132,24 +132,16 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
                     organizacion: ""
                 }; console.log("Error interno, no hay datos asociados al equipo con id '"+row.team_id+"'");}
 
-                var problems = new Map<string,{
-                    num_judged: number;
-                    num_pending: number;
-                    solved: boolean;
-                    time: number | null;
-                    first_to_solve: boolean | null;
-                }>();
-
                 //que cambios ha tenido un equipo desde la última comprobación
                 var cambioEquipo : String | null = null;
 
                 for(var problem of row.problems) {
-                    problem.problem_id;
-                    problem.num_judged;
-                    problem.num_pending;
-                    problem.solved;
-                    problem.time; //undefined si solved = false
-                    problem.first_to_solve; //posiblemente undefined
+                    //problem.problem_id;
+                    //problem.num_judged;
+                    //problem.num_pending;
+                    //problem.solved;
+                    //problem.time; //undefined si solved = false
+                    //problem.first_to_solve; //posiblemente undefined
                     
                     var problemData : TProblemData | null = ef.getDatosProblema(problem.problem_id);
                     if(problemData==null) {problemData = {
@@ -178,14 +170,6 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
                         }
                         
                     }
-
-                    problems.set(problem.problem_id, {
-                        num_judged: problem.num_judged,
-                        num_pending: problem.num_pending,
-                        solved: problem.solved,
-                        time: problem.time ? problem.time : null,
-                        first_to_solve: problem.first_to_solve ? problem.first_to_solve : null
-                    });
                 }
 
                 //Calcular diferencias entre un equipo y el mismo
@@ -198,17 +182,35 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
                     );
                 }
                 
-                that.datosEquipo.set(row.team_id, {
-                    score: row.score,
-                    rank: row.rank,
-                    problems: problems
-                });
             }
 
         }
         
         //Actualizar la información para la próxima vez que se llame aquí
         that.scoreboard = sb;
+        for(var row of sb.rows) {
+            var problems = new Map<string,{
+                num_judged: number;
+                num_pending: number;
+                solved: boolean;
+                time: number | null;
+                first_to_solve: boolean | null;
+            }>();
+            for(var problem of row.problems) {
+                problems.set(problem.problem_id, {
+                    num_judged: problem.num_judged,
+                    num_pending: problem.num_pending,
+                    solved: problem.solved,
+                    time: problem.time ? problem.time : null,
+                    first_to_solve: problem.first_to_solve ? problem.first_to_solve : null
+                });
+            }
+            that.datosEquipo.set(row.team_id, {
+                score: row.score,
+                rank: row.rank,
+                problems: problems
+            });
+        }
 
     }
 
@@ -254,6 +256,7 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
             case "fin_recap":
                 console.log("FIN RECAP, SE PIDE EL SCOREBOARD")
                 this.pedir_scoreboard(this.procesarScoreboard, this);
+                this.fin_recap = true;
                 break;
             case "envio":
                 if(this.fin_recap && this.congelado) {

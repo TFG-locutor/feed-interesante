@@ -38,7 +38,7 @@ class EventFactory {
     //Asocia un id a los datos de un problema
     _problemas: Map<string,TProblemData>;
     public getDatosProblema(id: string) : TProblemData | null {
-        var problema = this._equipos.get(id);
+        var problema = this._problemas.get(id);
         if(problema==undefined) return null;
         return problema;
     }
