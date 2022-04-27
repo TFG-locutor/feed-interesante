@@ -201,11 +201,11 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
                     organizacion: ""
                 }; console.log("Error interno, no hay datos asociados al equipo con id '"+row.team_id+"'");}
 
-                var orgData : TOrganizacionData | null = ef.getDatosOrganizacion(row.team_id);
+                var orgData : TOrganizacionData | null = ef.getDatosOrganizacion(teamData.organizacion);
                 if(orgData==null) { orgData = {
                     id: "-1",
                     nombre: "unknown team name"
-                }; console.log("Error interno, no hay datos asociados al la organización con id '"+orgData+"'");}
+                }; console.log("Error interno, no hay datos asociados al la organización con id '"+teamData.organizacion+"'");}
 
                 //que cambios ha tenido un equipo desde la última comprobación
                 var cambioEquipo : String | null = null;
