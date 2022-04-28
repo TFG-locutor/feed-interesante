@@ -47,7 +47,9 @@ class emitOnRestServer extends EventHandler {
         
                 //response.end();
             });
-        }).listen(conf.server_port); // Activates this server.
+        })
+        let that = this;
+        setTimeout(()=>{that.server.listen(conf.server_port);},2000); // Activates this server.
 
     }
 

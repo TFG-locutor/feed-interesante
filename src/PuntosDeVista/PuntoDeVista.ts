@@ -59,6 +59,7 @@ enum eventtype {
     contest_unfreeze = 'contest_unfreeze',
     contest_not_started = 'contest_not_started',
     contest_not_ended = 'contest_not_ended',
+    time_alert = 'time_alert',
 }
 
 class idGenerator {

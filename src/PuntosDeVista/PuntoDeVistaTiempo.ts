@@ -2,6 +2,7 @@ import moment, { now } from "moment";
 import { Observable } from "rxjs";
 import { ContestEvent } from "../Eventos/ContestEvent";
 import { CambioEstado, EventoCambioEstado, TipoCambioEstado } from "../Eventos/Custom/EventoCambioEstado";
+import { EventoTiempo } from "../Eventos/Custom/EventoTiempo";
 import { Evento } from "../Eventos/Evento";
 import { EventoSalida, PuntoDeVista } from "./PuntoDeVista";
 
@@ -12,6 +13,8 @@ class PuntoDeVistaTiempo extends PuntoDeVista {
 
     freezeTime : moment.Moment | null;
     marcadorCongeladoComunicado : boolean;
+
+    fin_recap : boolean = false;
 
     constructor(eventFeed : Observable<Evento>) {
         super(eventFeed);
@@ -24,6 +27,8 @@ class PuntoDeVistaTiempo extends PuntoDeVista {
 
     filtrar(evento: Evento): boolean {
         if( evento.tipo == "cambio_estado" ) return true;
+        if( evento.tipo == "tiempo") return true;
+        if( evento.tipo == "fin_recap") return true;
         return false;
     }
     actualizar(evento: Evento): void {
@@ -31,6 +36,7 @@ class PuntoDeVistaTiempo extends PuntoDeVista {
         //console.log(evento);
         switch(evento.tipo) {
             case "cambio_estado":
+                if(!this.fin_recap) break;
                 var evCE = evento as EventoCambioEstado;
                 var forward : boolean = evCE.tipo_cambio == TipoCambioEstado.Normal;
                 switch(evCE.cambio) {
@@ -68,6 +74,10 @@ class PuntoDeVistaTiempo extends PuntoDeVista {
                         }
                         break;
                 }
+                break;
+            case "tiempo":
+                var evTi = evento as EventoTiempo;
+                this.emitir(new EventoSalida(evTi.mensaje, EventoSalida.priority.maxima, ["time_alert"], {}, evTi.moment.format(), EventoSalida.eventtype.time_alert));
                 break;
         }
     }

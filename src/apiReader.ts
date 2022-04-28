@@ -77,7 +77,10 @@ class APIReader {
                             //Se está asumiendo qué si no se reciben datos en un periodo de 1seg, se ha terminado el recap inicial del event-feed
                             if(now.diff(lastDataMoment, "second") > 1) {
                                 endOfRecap = true;
-                                eventEmiter.next( new EventoFinRecap(now.format()) );
+                                var recap : Evento = new EventoFinRecap(now.format());
+                                eventEmiter.next( recap );
+                                var evs = EventFactory.ProcesarYEnriquecerEvento(recap);
+                                for(var _ev of evs) eventEmiter.next(_ev);
                             }
                         }
                         lastDataMoment = now;
@@ -141,7 +144,10 @@ class APIReader {
                         var now = moment();
                         if(lastDataMoment!=null && now.diff(lastDataMoment, "second") > 1) {
                             endOfRecap = true;
-                            eventEmiter.next( new EventoFinRecap(now.format()) );
+                            var recap : Evento = new EventoFinRecap(now.format());
+                            eventEmiter.next( recap );
+                            var evs = EventFactory.ProcesarYEnriquecerEvento(recap);
+                            for(var _ev of evs) eventEmiter.next(_ev);
                         }
                     }
                     var bumpSecondaryEvents = EventFactory.ProcesarYEnriquecerEvento(new EventoBump(moment().format()));

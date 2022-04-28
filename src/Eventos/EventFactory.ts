@@ -17,6 +17,7 @@ import { CambioEstado, EventoCambioEstado, TipoCambioEstado } from "./Custom/Eve
 import moment from "moment";
 import { TEquipoData, TGrupoData, TJudTypeData, TOrganizacionData, TProblemData, TSubData } from "../InternalDataTypes";
 import { StateEvent } from "./StateEvent";
+import { EventoTiempo } from "./Custom/EventoTiempo";
 
 
 //singleton
@@ -149,6 +150,15 @@ class EventFactory {
     public static ProcesarYEnriquecerEvento (ev: Evento) : Array<Evento> {
         return EventFactory.getInstance().ProcesarYEnriquecerEvento(ev);
     }
+
+    private mensajeQuedaMitad = false;
+    private mensajeQuedaUnCuarto = false;
+    private mensajeQuedan10Mins = false;
+    private mensajeQuedan5Mins = false;
+    private mensajeQuedan5MinsFreeze = false;
+
+    private end_of_recap = false;
+
     public ProcesarYEnriquecerEvento (ev: Evento) : Array<Evento> {
         if(ev==undefined||ev==null||ev.tipo==undefined) return [];
         //console.log(ev);
@@ -158,6 +168,46 @@ class EventFactory {
         /////////////////////////////
         //console.log("bump")
         let ajusteTiempoBump : moment.Moment = ev.moment; // = moment();
+
+        if( this.end_of_recap && (
+                !this.mensajeQuedaMitad ||
+                !this.mensajeQuedaUnCuarto ||
+                !this.mensajeQuedan10Mins ||
+                !this.mensajeQuedan5Mins
+            ) && this.contest_start!=null && this.contest_end!=null && this.freezeTime!=null
+        ) {
+            //console.log(this.contest_start);
+            //console.log(this.freezeTime);
+            //console.log(this.contest_end);
+            var minsDiff = this.contest_end.diff(ajusteTiempoBump, "minutes");
+            var minsDiffFreeze = this.freezeTime.diff(ajusteTiempoBump, "minutes");
+            
+            //console.log("Quedan "+minsDiff+" minutos para que acabe el concurso");
+            //console.log("Quedan "+minsDiffFreeze+" minutos para que se congele el marcador");
+            var dur_concurso = this.contest_end.diff(this.contest_start, "minutes");
+            //console.log("el concurso dura "+dur_concurso+" minutos, "+(dur_concurso/2)+" "+(dur_concurso/4) );
+            if(!this.mensajeQuedaMitad && minsDiff<=(dur_concurso/2) && minsDiff>=(dur_concurso/2)-1 ) {
+                eventos.push( new EventoTiempo(ajusteTiempoBump.format(), "¡Nos encontramos en el ecuador del concurso!") );
+                this.mensajeQuedaMitad = true;
+            }
+            if(!this.mensajeQuedaUnCuarto && minsDiff<=(dur_concurso/4) && minsDiff>=(dur_concurso/4)-1 ) {
+                eventos.push( new EventoTiempo(ajusteTiempoBump.format(), "¡Ya han pasado 3/4 del concurso!") );
+                this.mensajeQuedaUnCuarto = true;
+            }
+            if(!this.mensajeQuedan10Mins && minsDiff<=10 && minsDiff>=9) {
+                eventos.push( new EventoTiempo(ajusteTiempoBump.format(), "¡El concurso acaba en 10 minutos!") );
+                this.mensajeQuedan10Mins = true;
+            }
+            if(!this.mensajeQuedan5Mins && minsDiff<=5 && minsDiff>=4) {
+                eventos.push( new EventoTiempo(ajusteTiempoBump.format(), "¡El concurso acaba en 5 minutos!") );
+                this.mensajeQuedan5Mins = true;
+            }
+            if(!this.mensajeQuedan5MinsFreeze && minsDiffFreeze<=5 && minsDiffFreeze>=4) {
+                eventos.push( new EventoTiempo(ajusteTiempoBump.format(), "¡Quedan 5 minutos para que se congele el marcador!") );
+                this.mensajeQuedan5MinsFreeze = true;
+            }
+        }
+
         //ajusteTiempoBump.add(1,"second");
         //Cambios en el estado del concurso (empieza, acaba, se congela)
         if(!this.comunicados.get(CambioEstado.ConcursoIniciado) && this.contest_start!=null && this.contest_start.isSameOrBefore(ajusteTiempoBump)) {
@@ -197,6 +247,11 @@ class EventFactory {
                 this.sb_freeze_duration = evCon.scoreboard_freeze_duration;
                 this.contest_end = evCon.end_time;
                 this.contest_start = evCon.start_time;
+                var duration = evCon.duration;
+                if(!this.contest_end.isValid()) {
+                    this.contest_end = this.contest_start.clone();
+                    this.contest_end.add(duration);
+                }
                 //El concurso no había empezado pero la nueva fecha de inicio implica que empezó en el pasado
                 if(this.contest_start!=null && !this.comunicados.get(CambioEstado.ConcursoIniciado) && this.contest_start.isSameOrBefore(evCon.moment) ) {
                     this.comunicados.set( CambioEstado.ConcursoIniciado , true );
@@ -392,6 +447,9 @@ class EventFactory {
                         Math.abs(entry_intentos_por_equipo_problema)
                     ) );
                 }
+                break;
+            case "fin_recap":
+                this.end_of_recap = true;
                 break;
         }
 
