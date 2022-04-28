@@ -168,7 +168,7 @@ class EventFactory {
         /////////////////////////////
         //console.log("bump")
         let ajusteTiempoBump : moment.Moment = ev.moment; // = moment();
-
+        //console.log(this.comunicados);
         if( this.end_of_recap && (
                 !this.mensajeQuedaMitad ||
                 !this.mensajeQuedaUnCuarto ||
@@ -252,6 +252,8 @@ class EventFactory {
                     this.contest_end = this.contest_start.clone();
                     this.contest_end.add(duration);
                 }
+                //console.log("Start: "+this.contest_start.format());
+                //console.log("End: "+this.contest_end.format());
                 //El concurso no había empezado pero la nueva fecha de inicio implica que empezó en el pasado
                 if(this.contest_start!=null && !this.comunicados.get(CambioEstado.ConcursoIniciado) && this.contest_start.isSameOrBefore(evCon.moment) ) {
                     this.comunicados.set( CambioEstado.ConcursoIniciado , true );
@@ -294,6 +296,7 @@ class EventFactory {
                 if(this.sb_freeze_duration!=null && this.contest_end!=null) {
                     this.freezeTime = this.contest_end.clone();
                     this.freezeTime.subtract(this.sb_freeze_duration);
+                    //console.log("FreezeTime: "+this.freezeTime.format());
                     //console.log("Se ha actualizado la hora de congelado a: "+this.freezeTime.format());
                     //console.log(this.comunicados.get(CambioEstado.MarcadorCongelado) + " - " + evCon.moment.format())
                     //El marcador no se había congelado y ha pasado a estarlo

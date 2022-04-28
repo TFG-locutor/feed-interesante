@@ -79,6 +79,9 @@ class PuntoDeVistaTiempo extends PuntoDeVista {
                 var evTi = evento as EventoTiempo;
                 this.emitir(new EventoSalida(evTi.mensaje, EventoSalida.priority.maxima, ["time_alert"], {}, evTi.moment.format(), EventoSalida.eventtype.time_alert));
                 break;
+            case "fin_recap":
+                this.fin_recap = true;
+                break;
         }
     }
 

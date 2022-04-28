@@ -276,7 +276,7 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
                 //Calcular diferencias entre un equipo y el mismo (dentro de una organización)
                 if(entryDataOldOrg && entryDataNewOrg && entryDataOldOrg.rank > entryDataNewOrg.rank) {
 
-                    var eventoSalida = new EventoSalida("El equipo "+teamData.nombre+" ha pasado de la posición "+entryDataOldOrg.rank+" a la posición "+entryDataNewOrg+" dentro de la organización "+orgData.nombre+" después de "+cambioEquipoOrg,
+                    var eventoSalida = new EventoSalida("El equipo "+teamData.nombre+" ha pasado de la posición "+entryDataOldOrg.rank+" a la posición "+entryDataNewOrg.rank+" dentro de la organización "+orgData.nombre+" después de "+cambioEquipoOrg,
                     EventoSalida.priority.alta,[teamData.nombre, orgData.id, "AC", "scoreboard_organizacion"],{},moment().format(),EventoSalida.eventtype.organization_scoreboard_change);
                     that.emitir(eventoSalida);
 
