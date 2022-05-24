@@ -1,0 +1,5 @@
+/*! (c) 2020 Andrea Giammarchi */
+
+//! moment.js
+
+//! moment.js locale configuration
