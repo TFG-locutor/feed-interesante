@@ -266,18 +266,19 @@ class PuntoDeVistaScoreboard extends PuntoDeVista{
                 //Calcular diferencias entre un equipo y el mismo
 
                 var oldEntryEquipo = that.datosEquipo.get(row.team_id);
+                var prio = EventoSalida.priority.alta;
                 if(oldEntryEquipo && row.rank < oldEntryEquipo.rank) {
-
+                    prio = (row.rank<=10 ? EventoSalida.priority.alta : (row.rank<=20 ? EventoSalida.priority.media : EventoSalida.priority.baja));
                     var eventoSalida = new EventoSalida("El equipo "+teamData.nombre+" ha pasado de la posición "+oldEntryEquipo.rank+" a la posición "+row.rank+" después de "+cambioEquipo,
-                    EventoSalida.priority.alta,[teamData.nombre, orgData.id, "AC", "scoreboard_general"],{},moment().format(),EventoSalida.eventtype.general_scoreboard_change);
+                    prio,[teamData.nombre, orgData.id, "AC", "scoreboard_general"],{},moment().format(),EventoSalida.eventtype.general_scoreboard_change);
                     that.emitir(eventoSalida);
                 }
 
                 //Calcular diferencias entre un equipo y el mismo (dentro de una organización)
+                
                 if(entryDataOldOrg && entryDataNewOrg && entryDataOldOrg.rank > entryDataNewOrg.rank) {
-
                     var eventoSalida = new EventoSalida("El equipo "+teamData.nombre+" ha pasado de la posición "+entryDataOldOrg.rank+" a la posición "+entryDataNewOrg.rank+" dentro de la organización "+orgData.nombre+" después de "+cambioEquipoOrg,
-                    EventoSalida.priority.alta,[teamData.nombre, orgData.id, "AC", "scoreboard_organizacion"],{},moment().format(),EventoSalida.eventtype.organization_scoreboard_change);
+                    EventoSalida.priority.media,[teamData.nombre, orgData.id, "AC", "scoreboard_organizacion"],{},moment().format(),EventoSalida.eventtype.organization_scoreboard_change);
                     that.emitir(eventoSalida);
 
                 }
