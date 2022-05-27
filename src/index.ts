@@ -13,7 +13,7 @@ import { EventoBump } from "./Eventos/Custom/EventoBump";
 import { SaveOnLog } from "./SalidaEventos/SaveOnLog";
 import * as fs from 'fs';
 import { exit } from "process";
-import { tweetEvent } from "./SalidaEventos/twittterBot/tweetEvent";
+//import { tweetEvent } from "./SalidaEventos/twittterBot/tweetEvent";
 import { emitOnRestServer } from "./SalidaEventos/emitOnRestServer";
 import dotenv from "dotenv";
 
