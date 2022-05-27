@@ -1,0 +1,53 @@
+
+/*
+    Estilos, todo es ajustable ovbiamente
+*/
+
+*{
+    padding: 0px;
+    margin: 0px;
+    box-sizing: border-box;
+}
+
+html{
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#contenido{
+    margin-right: 30px;
+}
+
+#mensaje{
+    /*** TEXTO ***/
+    font-size: 25px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    
+    /*** COLORES ***/
+    background-color: rgb(194, 226, 237);
+    border: 1px solid rgb(58, 121, 173);
+    
+    /*** FORMA ***/
+    position: absolute;
+    bottom: 230px;
+    /*width: calc(100% - 30px);*/
+    max-width: calc(100% - 60px);
+    left: 30px;
+    
+    /*** OTROS ***/
+    border-radius: 5px;
+    padding: 5px 20px 5px 10px;
+}
+
+/*** LOGO ***/
+
+#logo{
+    border-radius: 50%;
+    position: absolute;
+    left: -15px;
+    height: 75px;
+    top: -15px;
+}
+
+#texto_mensaje{
+    margin-left: 60px;
+}
