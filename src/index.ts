@@ -20,8 +20,16 @@ import dotenv from "dotenv";
 console.log("Iniciando Programa...");
 dotenv.config();
 
-//console.log("Argumentos: ");
-//console.log(process.argv);
+console.log("Cargando configuración")
+if (process.env.url && process.env.port && process.env.contest_id) {
+    console.log("Cargando configuración desde variables de entorno");
+}
+else{
+    //console.log("Cargando configuración desde archivo");
+    //console.log("No se encontraron variables de entorno url, port y contest_id, abortando programa");
+    //exit(1);
+}
+
 
 //Se mira si se ha pasado algún argumento de entrada
 if(process.argv.length>2) {
@@ -59,15 +67,8 @@ if(process.argv.length>2) {
 //Punto de inicio del programa
 
 try{
-    console.log("Cargando configuración")
-    console.log("puerto" + process.env.port)
 
-    if (process.env.url && process.env.port && process.env.contest_id) {
-        console.log("Cargando configuración desde variables de entorno");
-    }
-    else{
-        console.log("Cargando configuración desde archivo");
-    }
+    
     let conf : Configuration = ConfigurationLoader.load();
 
     if(conf.cds.allow_expired_tls) process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
