@@ -25,7 +25,7 @@ if (process.env.url && process.env.port && process.env.contest_id) {
     console.log("Cargando configuración desde variables de entorno");
 }
 else{
-    //console.log("Cargando configuración desde archivo");
+    console.log("Cargando configuración desde archivo");
     //console.log("No se encontraron variables de entorno url, port y contest_id, abortando programa");
     //exit(1);
 }
@@ -96,10 +96,10 @@ try{
             logEvHandler.observeNewEventFeed(pv.getEventEmiter());
         });
 
-        let tweetEventHandler : EventHandler = new tweetEvent();
+        /* let tweetEventHandler : EventHandler = new tweetEvent();
         ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
             tweetEventHandler.observeNewEventFeed(pv.getEventEmiter());
-        }); 
+        });  */
 
         let serverEmit : EventHandler = new emitOnRestServer();
         ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
@@ -113,14 +113,7 @@ try{
 
     
 
-    /* var obs = eventEmiter.asObservable().pipe(
-        share(), //una misma ejecucion de la request
-        //map(obj=>EventFactory.obtenerEventoDesdeJSON(obj)),
-        //concatMap((e) => new Observable<Evento>((subscriber)=>{
-        //    subscriber.next(EventFactory.ProcesarYEnriquecerEvento(e));
-        //})),
-        filter(e=> e!==null),
-    ); */
+  
 
 
     

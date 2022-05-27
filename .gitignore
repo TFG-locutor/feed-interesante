@@ -3,3 +3,4 @@ build/
 FeedInteresante.config.json
 .env
 logs
+dist/
