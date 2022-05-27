@@ -9,7 +9,7 @@
         "webpack-cli": "^4.9.2"
     },
     "scripts": {
-        "start": "npx tsc && node build/src/index.js",
+        "start": "npx tsc && node build/index.js",
         "startdb": "npx tsc && node --trace-uncaught build/index.js",
         "build": "npx tsc",
         "buildist": "webpack"

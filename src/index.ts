@@ -15,8 +15,10 @@ import * as fs from 'fs';
 import { exit } from "process";
 import { tweetEvent } from "./SalidaEventos/twittterBot/tweetEvent";
 import { emitOnRestServer } from "./SalidaEventos/emitOnRestServer";
+import dotenv from "dotenv";
 
 console.log("Iniciando Programa...");
+dotenv.config();
 
 //console.log("Argumentos: ");
 //console.log(process.argv);
@@ -58,6 +60,8 @@ if(process.argv.length>2) {
 
 try{
     console.log("Cargando configuración")
+    console.log("puerto" + process.env.port)
+
     if (process.env.url && process.env.port && process.env.contest_id) {
         console.log("Cargando configuración desde variables de entorno");
     }
