@@ -1,5 +1,7 @@
 import { booleanItem, Confinode, ConfinodeResult, literal, numberItem, stringItem } from "confinode"
 import path from "path"
+import dotenv from "dotenv";
+import configuration from "../FeedInteresante.config.json" 
 
 //Manuales para cambiar la configuración:
 //  https://www.npmjs.com/package/confinode
@@ -22,7 +24,8 @@ interface Configuration {
 abstract class ConfigurationLoader {
 
     public static load() : Configuration {
-        const description = literal<Configuration>({
+        dotenv.config();
+        /* const description = literal<Configuration>({
             cds: literal({
                 url: stringItem(),
                 port: numberItem(),
@@ -44,20 +47,36 @@ abstract class ConfigurationLoader {
 
         var datos : ConfinodeResult<Configuration> | undefined = confinod.load.sync(dir);
 
-        if(datos==undefined) throw "Imposible cargar la configuración";
+        if(datos==undefined) throw "Imposible cargar la configuración"; */
+
+        if (process.env.url && process.env.port && process.env.contest_id) {
+            return {
+                cds: {
+                    url: process.env.url,
+                    port: parseInt(process.env.port),
+                    https: process.env.https? process.env.https==="true" : true,
+                    allow_expired_tls: process.env.allow_expired_tls? process.env.allow_expired_tls==="true" : false, 
+                    contest_id: process.env.contest_id,
+                    api_user: process.env.api_user? process.env.api_user : "",
+                    api_password: process.env.api_password ? process.env.api_password : ""
+                },
+                server_port: process.env.server_port ? parseInt(process.env.server_port) : configuration.server_port
+            }
+        } else {
 
         return {
             cds: {
-                url: datos.configuration.cds.url,
-                port: datos.configuration.cds.port,
-                https: datos.configuration.cds.https,
-                allow_expired_tls: datos.configuration.cds.allow_expired_tls,
-                contest_id: datos.configuration.cds.contest_id,
-                api_user: datos.configuration.cds.api_user,
-                api_password: datos.configuration.cds.api_password
+                url: configuration.cds.url,
+                port: configuration.cds.port,
+                https: configuration.cds.https,
+                allow_expired_tls: configuration.cds.allow_expired_tls,
+                contest_id: configuration.cds.contest_id,
+                api_user: configuration.cds.api_user,
+                api_password: configuration.cds.api_password
             },
-            server_port: datos.configuration.server_port
+            server_port: configuration.server_port
         };
+    }
     }
 
 }

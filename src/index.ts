@@ -58,6 +58,12 @@ if(process.argv.length>2) {
 
 try{
     console.log("Cargando configuración")
+    if (process.env.url && process.env.port && process.env.contest_id) {
+        console.log("Cargando configuración desde variables de entorno");
+    }
+    else{
+        console.log("Cargando configuración desde archivo");
+    }
     let conf : Configuration = ConfigurationLoader.load();
 
     if(conf.cds.allow_expired_tls) process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
