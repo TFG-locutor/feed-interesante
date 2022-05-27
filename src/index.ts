@@ -15,11 +15,21 @@ import * as fs from 'fs';
 import { exit } from "process";
 import { tweetEvent } from "./SalidaEventos/twittterBot/tweetEvent";
 import { emitOnRestServer } from "./SalidaEventos/emitOnRestServer";
+import dotenv from "dotenv";
 
 console.log("Iniciando Programa...");
+dotenv.config();
 
-//console.log("Argumentos: ");
-//console.log(process.argv);
+console.log("Cargando configuración")
+if (process.env.url && process.env.port && process.env.contest_id) {
+    console.log("Cargando configuración desde variables de entorno");
+}
+else{
+    console.log("Cargando configuración desde archivo");
+    //console.log("No se encontraron variables de entorno url, port y contest_id, abortando programa");
+    //exit(1);
+}
+
 
 //Se mira si se ha pasado algún argumento de entrada
 if(process.argv.length>2) {
@@ -57,7 +67,8 @@ if(process.argv.length>2) {
 //Punto de inicio del programa
 
 try{
-    console.log("Cargando configuración")
+
+    
     let conf : Configuration = ConfigurationLoader.load();
 
     if(conf.cds.allow_expired_tls) process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -85,10 +96,10 @@ try{
             logEvHandler.observeNewEventFeed(pv.getEventEmiter());
         });
 
-        let tweetEventHandler : EventHandler = new tweetEvent();
+        /* let tweetEventHandler : EventHandler = new tweetEvent();
         ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
             tweetEventHandler.observeNewEventFeed(pv.getEventEmiter());
-        }); 
+        });  */
 
         let serverEmit : EventHandler = new emitOnRestServer();
         ManagerPuntosDeVista.getviewpoint_data().forEach(pv=>{
@@ -102,14 +113,7 @@ try{
 
     
 
-    /* var obs = eventEmiter.asObservable().pipe(
-        share(), //una misma ejecucion de la request
-        //map(obj=>EventFactory.obtenerEventoDesdeJSON(obj)),
-        //concatMap((e) => new Observable<Evento>((subscriber)=>{
-        //    subscriber.next(EventFactory.ProcesarYEnriquecerEvento(e));
-        //})),
-        filter(e=> e!==null),
-    ); */
+  
 
 
     

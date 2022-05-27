@@ -1,12 +1,13 @@
 {
     "cds" : {
-        "url": "b7cb71be-8609-4bd4-8087-9946024bccac.clouding.host",
-        "port": 8443,
+        "url": "",
+        "port": 443,
         "https": true,
-        "allow_expired_tls": true,
-        "contest_id": "hello_world_contest",
+        "allow_expired_tls": false,
+        "contest_id": "",
         "api_user": "",
         "api_password": ""
     },
     "server_port": 1337
 }
+
