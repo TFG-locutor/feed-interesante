@@ -1,4 +1,5 @@
-# feed-interesante
+# Locutor automático de concursos de programación
+
 Hemos desarrollado un locutor automático de concursos de programación. Su comportamiento se basa en la recopilación de información estática y dinámica de concursos en tiempo real, y su posterior procesamiento para generar comentarios interesantes y mantener la emoción. La arquitectura de este locutor busca ser extensible, dando la posibilidad de que se añadan nuevos tipos de mensajes fácilmente, ampliando la funcionalidad del programa. Además, ofrece la posibilidad de conectar distintos clientes, ya sea para enriquecer una retransmisión en streaming, publicar tweets periódicos, alimentar bots de Telegram o incluso ayudar a un locutor humano en su labor.
 
 # Configuración variables del sistema
